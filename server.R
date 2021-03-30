@@ -5,8 +5,14 @@ function(input, output, session) {
   output$tbl_country_list <- reactable::renderReactable( {
     df <- dx_policy
     
-    # Select only rows to show
+    # Select only cols to show
     df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country"), with = FALSE]
+    
+    # Select only rows to show
+    if (input$cb_show_data) {
+      na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
+      df <- df[na_rows == 0]
+    }
     
     # Columns list
     if (input$rb_group == "Country") {
@@ -178,7 +184,7 @@ function(input, output, session) {
                 )
               ),
               language = reactableLang(
-                searchPlaceholder = "Filter country, region or income group",
+                searchPlaceholder = "Filter country, continent or income group",
                 noData = "No entries for this filter",
                 pagePrevious = "\u276e",
                 pageNext = "\u276f",

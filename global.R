@@ -75,14 +75,15 @@ dx_policy[, `Flag` := paste0(
 # Add selection checkbox column -----------------
 # select_colname <- shinyInput(checkboxInput, id = 'select_all', value = TRUE)
 # dx_policy[, (select_colname) := shinyInput(checkboxInput, nrow(dx_policy), 'tbl_selection_', value = TRUE)]
-setcolorder(dx_policy, c("Flag", "Country", "Continent", "Region", "Income", "Date of last update"))
+setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update"))
 
 data_map <- copy(dx_policy)
 
 # Remove unnecessary columns --------------------
 dx_policy[, `:=`(
   ISO = NULL,
-  iso2c = NULL
+  iso2c = NULL,
+  Region = NULL
 )]
 
 # # Determine long cols ---------------------------

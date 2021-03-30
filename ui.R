@@ -58,7 +58,6 @@ tablerDashPage(
                                                    )
                                           ),
                                           
-                                          
                                           echarts4rOutput("map", height = "450px"),
                                           
                                           tags$div(class = "info-container", style = "margin-top: -50px;",
@@ -128,7 +127,6 @@ tablerDashPage(
                                                     General = c(
                                                       "Country",
                                                       "Continent",
-                                                      "Region",
                                                       "Income",
                                                       "Date of last update",
                                                       "Does the country have a policy that guides covid-19 testing strategy?",
@@ -158,6 +156,9 @@ tablerDashPage(
                                                   ), 
                                                   selected = default_cols
                                                 )
+                                       ),
+                                       tags$div(class = "info-container",
+                                                prettyCheckbox("cb_show_data", "Show only countries with data", value = TRUE)
                                        ),
                                        reactable::reactableOutput("tbl_country_list")
                                    )
