@@ -39,17 +39,12 @@ tablerDashPage(
                                  fluidRow(
                                    column(width = 12,
                                           br(),
-                                          # pickerInput(
-                                          #   inputId = "slt_category",
-                                          #   label = "Select column to show", 
-                                          #   multiple = FALSE,
-                                          #   width = "fit",
-                                          #   choices = testing_cols
-                                          # ),
-                                          awesomeRadio(
+                                          prettyRadioButtons(
                                             inputId = "slt_category",
                                             label = "Test type", 
-                                            choices = c("Molecular Test", "Antigen RDT", "Antibody RDT")
+                                            choices = c("Molecular Test", "Antigen RDT", "Antibody RDT"), 
+                                            status = "default",
+                                            inline = TRUE
                                           ),
                                           echarts4rOutput("map", height = "450px"),
                                           
