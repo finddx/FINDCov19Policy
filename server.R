@@ -282,6 +282,16 @@ function(input, output, session) {
       ", category)))
   })
   
+  # Download selected rows ----------------------
+  output$lnk_download_selected <- downloadHandler(
+    filename = function() {
+      paste('data-', Sys.Date(), '.csv', sep='')
+    },
+    content = function(file) {
+      df <- dx_policy[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+      fwrite(x = df, file = file)
+    }
+  )
   
   # output$tbl_country_list <- renderDT(server = TRUE, {
   #   

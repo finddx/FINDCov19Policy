@@ -167,7 +167,7 @@ tablerDashPage(
                                    column(width = 12,
                                           br(),
                                           h3("Download the data"),
-                                          p("The selected data can be downloaded from", downloadLink("o_download_selected", label = "here.")),
+                                          p("The selected data can be downloaded from", downloadLink("lnk_download_selected", label = "here.")),
                                           p("All data is available through stable links as ",
                                             a(href = "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/data_all.csv", target="_blank", "CSV."),
                                             "A",
