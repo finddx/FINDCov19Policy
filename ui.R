@@ -39,13 +39,26 @@ tablerDashPage(
                                  fluidRow(
                                    column(width = 12,
                                           br(),
-                                          prettyRadioButtons(
-                                            inputId = "slt_category",
-                                            label = "Test type", 
-                                            choices = c("Molecular Test", "Antigen RDT", "Antibody RDT"), 
-                                            status = "default",
-                                            inline = TRUE
+                                          
+                                          tags$div(class = "info-container",
+                                                   prettyRadioButtons(
+                                                     inputId = "slt_category",
+                                                     label = NULL, 
+                                                     choices = c("Molecular Test", "Antigen RDT", "Antibody RDT"), 
+                                                     status = "default",
+                                                     inline = TRUE
+                                                   ),
+                                                   tags$span(
+                                                     class="info-mark",
+                                                     icon("info-circle"),
+                                                     tags$div(
+                                                       class = "info-mark-text",
+                                                       tags$p('Please select to display whether Molecular/Antigen/Antibody testing is registered for use in countries')
+                                                     )
+                                                   )
                                           ),
+                                          
+                                          
                                           echarts4rOutput("map", height = "450px"),
                                           
                                           tags$div(class = "info-container", style = "margin-top: -50px;",
@@ -69,21 +82,6 @@ tablerDashPage(
                                           )
                                    )
                                  ),
-                                 # fluidRow(
-                                 #   div(class = "col-md-3 offset-md-9",
-                                 #       # chooseSliderSkin(skin = "Modern", color = "#43abb6"),
-                                 #       sliderInput(
-                                 #         "i_time",
-                                 #         label = "Select date",
-                                 #         min = min(shiny_data$time),
-                                 #         max = max(shiny_data$time),
-                                 #         value = slider_date,
-                                 #         timeFormat = "%d %b",
-                                 #         animate = animationOptions(interval = 200, loop = FALSE, playButton = icon("play"), pauseButton = icon("pause")),
-                                 #         width = "100%"
-                                 #       )
-                                 #   )
-                                 # ),
                                  
                                  fluidRow(
                                    div(class = "col-sm-12",
@@ -162,7 +160,6 @@ tablerDashPage(
                                                 )
                                        ),
                                        reactable::reactableOutput("tbl_country_list")
-                                       #DTOutput("tbl_country_list")
                                    )
                                  ),
                                  
