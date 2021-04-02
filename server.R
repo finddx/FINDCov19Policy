@@ -1,6 +1,10 @@
 function(input, output, session) {
   selected <- reactive(getReactableState("tbl_country_list", "selected"))
 
+  observe( {
+    print(input$map_clicked_data)
+  })
+  
   # Render table --------------------------------
   output$tbl_country_list <- reactable::renderReactable( {
     df <- dx_policy
@@ -19,7 +23,7 @@ function(input, output, session) {
       columns_list <- list(
         Flag = colDef(show = FALSE),
         
-        Country = colDef(html = TRUE, minWidth = 150, cell = JS("
+        Country = colDef(html = TRUE, cell = JS("
                   function(cellInfo) {
                     var elem = cellInfo.row['Flag'] + cellInfo.value
                     return elem;
@@ -103,8 +107,8 @@ function(input, output, session) {
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for testing at borders /points of entry?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for testing at borders /points of entry?"]][[index]], 
+        `Are antigen rapid tests used for testing at borders / points of entry?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antigen rapid tests used for testing at borders / points of entry?"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
@@ -142,7 +146,7 @@ function(input, output, session) {
                                                         "Are antigen rapid tests used for the screening of asymptomatic patients?",
                                                         "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
                                                         "Are antigen rapid tests used for testing of health care workers / front line staff?",
-                                                        "Are antigen rapid tests used for testing at borders /points of entry?",
+                                                        "Are antigen rapid tests used for testing at borders / points of entry?",
                                                         "Are antigen rapid tests used for testing at schools / workplaces?",
                                                         "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
                                                         "Who is allowed to use the Ag-RDTs (only health workers etc)?")]
@@ -162,7 +166,7 @@ function(input, output, session) {
     )
     columnGroups_list[sapply(columnGroups_list, is.null)] <- NULL
 
-    reactable(df,
+    out <- reactable(df,
               selection = "multiple",
               onClick = "select",
               defaultSorted = input$rb_group,
@@ -192,6 +196,23 @@ function(input, output, session) {
               columns = columns_list,
               columnGroups = columnGroups_list
     )
+    
+    if (input$rb_group == "Country") {
+      range_filter_cols <- c("Continent", "Income", "Does the country have a policy that guides Covid-19 testing strategy?", testing_cols)
+      
+      #filter_cols <- which(colnames(df) %in% testing_cols)
+      columns_name <- sapply(out$x$tag$attribs$columns, `[[`, "name")
+      
+      for (i in range_filter_cols) {
+        if (i %in% columns_name) {
+          idx <- which(i == columns_name)
+          out$x$tag$attribs$columns[[idx]]$filterMethod <- htmlwidgets::JS("filterRange")
+          out$x$tag$attribs$columns[[idx]]$Filter <- build_filter_range(df[[i]])
+        }
+      }
+    }
+
+    return(out)
   })
 
   output$map <- renderEcharts4r( {
@@ -295,6 +316,12 @@ function(input, output, session) {
     },
     content = function(file) {
       df <- dx_policy[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+      
+      if (input$cb_show_data) {
+        na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
+        df <- df[na_rows == 0]
+      }
+      
       fwrite(x = df, file = file)
     }
   )

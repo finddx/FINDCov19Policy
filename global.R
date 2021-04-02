@@ -16,6 +16,13 @@ library(lubridate)
 library(purrr)
 library(sparkline)
 
+material_dep <- htmltools::htmlDependency(
+  name = "material-ui",
+  version = "4.6.1",
+  src = c(href = "https://unpkg.com/@material-ui/core/umd/"),
+  script = "material-ui.production.min.js"
+)
+
 # Read helper functions
 helper_files <- dir("helpers", full.names = TRUE)
 lapply(helper_files, source)
@@ -28,7 +35,7 @@ wb_classification[, Income := `Income group`]
 wb_classification[, `Income group` := NULL]
 
 # Read dx policy --------------------------------
-dx_policy <- readxl::read_xlsx("data/March 15 Deliverable_Policy Mapping Data Capture Sheet.xlsx")
+dx_policy <- readxl::read_xlsx("data/March 29 Deliverable_Updated Policy Mapping Template.xlsx")
 setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
 dx_policy[, `Notes` := NULL]
@@ -95,15 +102,10 @@ dx_policy[, `:=`(
 # Global variables ------------------------------
 public_cols <- setdiff(colnames(dx_policy), c("Flag"))
 
-# Convert columns to factor/date ----------------
-factor_cols <- public_cols[!public_cols %in% c("Policy Links", "Date of last update")]
-dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
-dx_policy[, `Date of last update` := as_date(`Date of last update`)]
-
 default_cols <- c("Country", 
                   "Continent",
                   "Income",
-                  "Does the country have a policy that guides covid-19 testing strategy?", 
+                  "Does the country have a policy that guides Covid-19 testing strategy?", 
                   "Is molecular testing registered for use in country?",
                   "Is molecular testing used to confirm a Covid-19 diagnosis?",
                   "Are antibody rapid tests registered for use in country?",
@@ -124,9 +126,22 @@ testing_cols <- c("Is molecular testing registered for use in country?",
                   "Are antigen rapid tests used for the screening of asymptomatic patients?",
                   "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
                   "Are antigen rapid tests used for testing of health care workers / front line staff?",
-                  "Are antigen rapid tests used for testing at borders /points of entry?",
+                  "Are antigen rapid tests used for testing at borders / points of entry?",
                   "Are antigen rapid tests used for testing at schools / workplaces?",
                   "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?"
 )
+
+dx_policy[, (testing_cols) := lapply(.SD, function(x) {
+  ifelse(x == "No Data", "No data", x)
+}), .SDcols = testing_cols]
+
+dx_policy[, (testing_cols) := lapply(.SD, function(x) {
+  ifelse(x == "yes", "Yes", x)
+}), .SDcols = testing_cols]
+
+# Convert columns to factor/date ----------------
+factor_cols <- public_cols[!public_cols %in% c("Policy Links", "Date of last update")]
+dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
+dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 
 value_lookup <- c("NA" = 0, "No data" = 1, "No" = 2, "Yes" = 3)

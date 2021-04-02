@@ -20,7 +20,55 @@ tablerDashPage(
       tags$link(href = "style.css", rel = "stylesheet"),
       
       # tags$link(href='https://fonts.googleapis.com/css?family=Lato:400,700,300,900'),
-      tags$link(href="https://fonts.googleapis.com/css2?family=Roboto:300")
+      tags$link(href="https://fonts.googleapis.com/css2?family=Roboto:300"),
+      
+      
+      reactR::html_dependency_react(),
+      reactR::html_dependency_reacttools(),
+      htmlwidgets::getDependency("reactable","reactable"),
+      material_dep,
+      tags$style("
+        .rt-thead.-filters .rt-tr {align-items: flex-end; height: 60px;}
+        .rt-thead.-filters .rt-th {overflow: visible;}
+        menuitem {display: block;}
+      "),
+      
+      tags$script(HTML("
+        function filterRange(filter, rows) {
+          return rows.filter(function(row) {
+            // Don't filter on aggregated cells
+            if (row._subRows) {
+              return true;
+            }
+  
+            if (filter.value == '') {
+              return true;
+            }
+            return row[filter.id] == filter.value;
+          })
+        }
+        
+        function inputFilter(filter) {
+          var _onChange = filter.onChange;
+          return React.createElement(
+            'div',
+            null,
+            React.createElement(
+              MaterialUI.Select,
+              {
+                children: [
+                            React.createElement('option', {value: ''}, ''),
+                            React.createElement('option', {value: 'Yes'}, 'Yes'),
+                            React.createElement('option', {value: 'No'}, 'No'),
+                            React.createElement('option', {value: 'No data'}, 'No data')
+                ],
+                native: true,
+                onChange: function onChange(event, newValue) {return _onChange(event.target.value)}
+              }
+            )
+          )
+        }
+      "))
     ),
     fluidRow(
       # put everything in a huge tablerCard, to ensure nice borders
@@ -129,7 +177,7 @@ tablerDashPage(
                                                       "Continent",
                                                       "Income",
                                                       "Date of last update",
-                                                      "Does the country have a policy that guides covid-19 testing strategy?",
+                                                      "Does the country have a policy that guides Covid-19 testing strategy?",
                                                       "Policy Links"
                                                     ),
                                                     `Molecular testing` = c(
@@ -148,7 +196,7 @@ tablerDashPage(
                                                       "Are antigen rapid tests used for the screening of asymptomatic patients?",
                                                       "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
                                                       "Are antigen rapid tests used for testing of health care workers / front line staff?",
-                                                      "Are antigen rapid tests used for testing at borders /points of entry?",
+                                                      "Are antigen rapid tests used for testing at borders / points of entry?",
                                                       "Are antigen rapid tests used for testing at schools / workplaces?",
                                                       "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
                                                       "Who is allowed to use the Ag-RDTs (only health workers etc)?"
