@@ -115,7 +115,9 @@ default_cols <- c("Country",
                   "Are antigen rapid tests used to confirm Covid-19 diagnosis?",
                   "Are antigen rapid tests used for the testing of symptomatic patients?")
 
-testing_cols <- c("Is molecular testing registered for use in country?",
+testing_cols <- c("Does the country have a policy that guides Covid-19 testing strategy?",
+  
+                  "Is molecular testing registered for use in country?",
                   "Is molecular testing used to confirm a Covid-19 diagnosis?",
                   "Are antibody rapid tests registered for use in country?",
                   "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",

@@ -48,6 +48,17 @@ function(input, output, session) {
                 ")),
         `Policy Links` = colDef(html = TRUE, minWidth = 1000)
       )
+      # columns_list <- c(
+      #   columns_list, 
+      #   sapply(column_choices$`Molecular testing`, simplify = FALSE, USE.NAMES = TRUE, function(x) {
+      #     colDef(#class = "my-col"
+      #       style = function(value) {
+      #         list(`background-color` = "red")
+      #       }
+      #     )
+      #   })
+      # )
+      
       columns_list <- columns_list[names(columns_list) %in% c(colnames(df), "Flag", "Country")]
     } else {
       testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
@@ -67,6 +78,12 @@ function(input, output, session) {
       colnames(df) <- c(input$rb_group, testing_df_cols)
       
       columns_list <- list(
+        `Does the country have a policy that guides Covid-19 testing strategy?` = colDef(cell = function(value, index) {
+          sparkline(df[["Does the country have a policy that guides Covid-19 testing strategy?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
+        }),
+        
         `Is molecular testing registered for use in country?` = colDef(cell = function(value, index) {
           sparkline(df[["Is molecular testing registered for use in country?"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
