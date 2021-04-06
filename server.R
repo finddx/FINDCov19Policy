@@ -1,22 +1,39 @@
 function(input, output, session) {
   selected <- reactive(getReactableState("tbl_country_list", "selected"))
-
-  observe( {
-    print(input$map_clicked_data)
-  })
   
-  # Render table --------------------------------
-  output$tbl_country_list <- reactable::renderReactable( {
-    df <- dx_policy
+  policy_data <- reactive( {
+    req(!is.null(input$cb_show_data))
     
-    # Select only cols to show
-    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country"), with = FALSE]
+    df <- dx_policy
     
     # Select only rows to show
     if (input$cb_show_data) {
       na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
       df <- df[na_rows == 0]
     }
+  })
+  
+  observeEvent(input$map_clicked_data, {
+    # df <- dx_policy
+    # if (input$cb_show_data) {
+    #   na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
+    #   df <- df[na_rows == 0]
+    # }
+    # 
+    # country <- sort(as.character(df$Country))
+    # new_selected_idx <- which(country == input$map_clicked_data$name)
+    # current_selection <- getReactableState("tbl_country_list", "selected")
+    # 
+    # updateReactable("tbl_country_list", selected = unique(c(current_selection, new_selected_idx)))
+  })
+  
+  # Render table --------------------------------
+  output$tbl_country_list <- reactable::renderReactable( {
+    req(policy_data())
+    df <- copy(policy_data())
+    
+    # Select only cols to show
+    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country"), with = FALSE]
     
     # Columns list
     if (input$rb_group == "Country") {
@@ -215,63 +232,73 @@ function(input, output, session) {
     return(out)
   })
 
+  # Render Map --------------------------------------------
   output$map <- renderEcharts4r( {
     req(input$slt_category)
     
     if (input$slt_category == "Molecular Test") {
-      category <- "Is molecular testing registered for use in country?"
+      value <- "Is molecular testing registered for use in country?"
     } else if (input$slt_category == "Antigen RDT") {
-      category <- "Are antigen rapid tests registered for use in country?"
+      value <- "Are antigen rapid tests registered for use in country?"
     } else if (input$slt_category == "Antibody RDT") {
-      category <- "Are antibody rapid tests registered for use in country?"
+      value <- "Are antibody rapid tests registered for use in country?"
     }
     
     theme <- "grey"
     
     df <- copy(data_map)
     df <- df[Country != "Kosovo"]
-    df <- e_country_names(df, iso2c, unit)
+    df <- e_country_names(df, iso2c, name)
 
     colors <- c(
-      if (NA %in% df[[category]]) {
+      if ("No data" %in% df[[value]]) {
         "#cbcbcb"
       },
-      if ("No data" %in% df[[category]]) {
-        "#cbcbcb"
-      },
-      if ("No" %in% df[[category]]) {
+      if ("No" %in% df[[value]]) {
         "#cd4651"
       },
-      if ("Yes" %in% df[[category]]) {
+      if ("Yes" %in% df[[value]]) {
         "#44abb6"
       }
     )
     
-    #label <- get_label(df[[category]])
+    #label <- get_label(df[[value]])
     label <- list(
-      if (NA %in% df[[category]]) {
-        list(min = 0, max = 0, label = "NA") 
-      },
-      if ("No data" %in% df[[category]]) {
+      if ("No data" %in% df[[value]]) {
         list(min = 1, max = 1, label = "No data")
       },
-      if ("No" %in% df[[category]]) {
+      if ("No" %in% df[[value]]) {
         list(min = 2, max = 2, label = "No")
       },
-      if ("Yes" %in% df[[category]]) {
+      if ("Yes" %in% df[[value]]) {
         list(min = 3, max = 3, label = "Yes")
       }
     )
     label[sapply(label, is.null)] <- NULL
     
-    df$category <- df[[category]]
-    df[, category := value_lookup[ifelse(is.na(category), "NA", category)]]
+    df$value <- df[[value]]
+    df[, value := value_lookup[ifelse(is.na(value), "No data", value)]]
+
+    selected_test_cols <- switch (input$slt_category,
+      `Molecular Test` = column_choices$`Molecular testing`,
+      `Antigen RDT` = column_choices$`Antigen testing`,
+      `Antibody RDT` = column_choices$`Antibody testing`
+    )
+    # selected_test_cols <- setdiff(
+    #   selected_test_cols, 
+    #   c("Is molecular testing registered for use in country?", 
+    #     "Are antibody rapid tests registered for use in country?",
+    #     "Are antigen rapid tests registered for use in country?")
+    # )
     
     df %>%
-      e_charts(unit, dispose = FALSE) %>% 
-      e_map_("category", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10)) %>%
+      e_charts(name, dispose = FALSE) %>% 
+      e_map_("value", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10),
+             selectedMode = "multiple",
+             data = purrr::transpose(df)
+      ) %>%
       e_visual_map_(
-        "category",
+        "value",
         type = "piecewise",
         bottom = "20%",
         left = "0%",
@@ -304,9 +331,34 @@ function(input, output, session) {
           } else {
             value = '';
           };
-          return('%s' + '<br>' + params.name + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + '</span>')
+          
+          var test_cols = '%s';
+          var testcolArray = test_cols.split('|');
+          var list = '';
+          
+          for (i = 0; i < testcolArray.length; i++) {
+            var key = testcolArray[i];
+            var paramValue = 'No data';
+            
+            if (params.data.hasOwnProperty(key) && params.data[key] !== null) {
+              paramValue = params.data[key];
+            }
+            list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
+          } 
+          
+          //'</h4>' + '%s' + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + 
+          return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }
-      ", category)))
+      ", paste0(selected_test_cols, collapse = "|"), value)), 
+                position = JS("function (pos, params, dom, rect, size) {
+                  // tooltip will be fixed on the right if mouse hovering on the left,
+                  // and on the left if hovering on the right.
+                  var obj = {top: 60};
+                  obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+                  return obj;
+                }"),
+                backgroundColor = 'rgba(255, 255, 255, 0.6)'
+      )
   })
   
   # Download selected rows ----------------------
@@ -315,12 +367,9 @@ function(input, output, session) {
       paste('data-', Sys.Date(), '.csv', sep='')
     },
     content = function(file) {
-      df <- dx_policy[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
-      
-      if (input$cb_show_data) {
-        na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
-        df <- df[na_rows == 0]
-      }
+      req(policy_data())
+      df <- copy(policy_data())
+      df <- df[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
       
       fwrite(x = df, file = file)
     }

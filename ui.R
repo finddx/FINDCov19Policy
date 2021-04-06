@@ -171,37 +171,7 @@ tablerDashPage(
                                                     size = 8,
                                                     `selected-text-format` = "count > 3"
                                                   ),
-                                                  choices = list(
-                                                    General = c(
-                                                      "Country",
-                                                      "Continent",
-                                                      "Income",
-                                                      "Date of last update",
-                                                      "Does the country have a policy that guides Covid-19 testing strategy?",
-                                                      "Policy Links"
-                                                    ),
-                                                    `Molecular testing` = c(
-                                                      "Is molecular testing registered for use in country?",
-                                                      "Is molecular testing used to confirm a Covid-19 diagnosis?"
-                                                    ),
-                                                    `Antibody testing` = c(
-                                                      "Are antibody rapid tests registered for use in country?",                                                        
-                                                      "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
-                                                      "Are antibody rapid tests used for serosurveillance studies of Covid-19?"
-                                                    ),
-                                                    `Antigen testing` = c(
-                                                      "Are antigen rapid tests registered for use in country?",
-                                                      "Are antigen rapid tests used to confirm Covid-19 diagnosis?",
-                                                      "Are antigen rapid tests used for the testing of symptomatic patients?",
-                                                      "Are antigen rapid tests used for the screening of asymptomatic patients?",
-                                                      "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
-                                                      "Are antigen rapid tests used for testing of health care workers / front line staff?",
-                                                      "Are antigen rapid tests used for testing at borders / points of entry?",
-                                                      "Are antigen rapid tests used for testing at schools / workplaces?",
-                                                      "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
-                                                      "Who is allowed to use the Ag-RDTs (only health workers etc)?"
-                                                    )
-                                                  ), 
+                                                  choices = column_choices, 
                                                   selected = default_cols
                                                 )
                                        ),
