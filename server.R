@@ -381,151 +381,92 @@ function(input, output, session) {
   # Download selected rows ----------------------
   output$lnk_download_selected <- downloadHandler(
     filename = function() {
-      paste('data-', Sys.Date(), '.csv', sep='')
+      if (input$rb_group == "Country") {
+        file_extension <- "csv"
+      } else {
+        file_extension <- "xlsx"
+      }
+      paste('data-', Sys.Date(), '.', file_extension, sep='')
     },
     content = function(file) {
       req(policy_data())
       df <- copy(policy_data())
-      df <- df[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
       
-      fwrite(x = df, file = file)
+      if (input$rb_group == "Country") {
+        # Country
+        df <- df[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+        
+        fwrite(x = df, file = file)
+      } else {
+        # Continent / Income group
+        categories <- as.character(na.omit(unique(df[[input$rb_group]])))[selected()]
+        testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
+        
+        df <- lapply(categories, function(category) {
+          ds <- lapply(testing_df_cols, function(col) {
+            data.table(
+              df[get(input$rb_group) == category, paste0(round(sum(get(col) == "Yes") / .N * 100, 1), "%")],
+              df[get(input$rb_group) == category, paste0(round(sum(get(col) == "No") / .N * 100, 1), "%")],
+              df[get(input$rb_group) == category, paste0(round(sum(get(col) == "No data") / .N * 100, 1), "%")]
+            ) %>% 
+              setnames(new = paste0(col, " (", c("Yes", "No", "No data"), ")"))
+          })
+          
+          cbind.data.frame(
+            category,
+            ds
+          )
+        }) %>%
+          rbindlist(use.names = FALSE)
+        
+        # Write xlsx
+        wb <- createWorkbook()
+        addWorksheet(wb, sheetName = input$rb_group)
+        
+        # First row
+        writeData(wb, x = t(c(input$rb_group, rep(testing_df_cols, each = 3))), sheet = 1, 
+                  colNames = FALSE, rowNames = FALSE)
+        
+        # Merge cells
+        no_of_cols <- 1 + length(testing_df_cols) * 3
+        
+        for (i in seq(from = 2, to = no_of_cols, by = 3)) { 
+          mergeCells(wb, sheet = 1, cols = seq(from = i, to = i + 2), rows = 1)
+        }
+        
+        mergeCells(wb, sheet = 1, cols = 1, rows = 1:2)
+        
+        # Add second row
+        writeData(wb, x = t(rep(c("Yes (%)", "No (%)", "No data (%)"), times = length(testing_df_cols))), sheet = 1,
+                  startRow = 2, startCol = 2,
+                  colNames = FALSE, rowNames = FALSE)
+        
+        # Add data
+        writeData(wb, x = df, sheet = 1, startRow = 3, startCol = 1, colNames = FALSE, rowNames = FALSE)
+
+        # Styling
+        addStyle(wb, sheet = 1, style = createStyle(textDecoration = "bold", halign = "center", valign = "center", wrapText = TRUE), 
+                 rows = 1, cols = 1:no_of_cols)
+        addStyle(wb, sheet = 1, style = createStyle(textDecoration = "bold", halign = "center", valign = "center"), 
+                 rows = 2, cols = 1:no_of_cols)
+        addStyle(wb, sheet = 1, style = createStyle(textDecoration = "bold", halign = "center", valign = "center", wrapText = FALSE), 
+                 rows = 1, cols = 1)
+        
+        setColWidths(wb, sheet = 1, ignoreMergedCells = TRUE, cols = seq_len(no_of_cols), widths = "auto")
+        
+        saveWorkbook(wb, file = file)
+      }
     }
   )
   
-  # output$tbl_country_list <- renderDT(server = TRUE, {
-  #   
-  #   df <- dx_policy
-  # 
-  #   flag_render <- JS("
-  #     function(data, type, row) {
-  #       if (type === 'display') {
-  #         var x = row[1] + data;
-  #         return x;
-  #       } else {
-  #         return data;
-  #       }
-  #     }
-  #   ")
-  #   
-  #   long_cols_pos <- which(colnames(df) %in% names(long_cols))
-  #   
-  #   table_container <- htmltools::withTags(table(
-  #     class = 'display',
-  #     thead(
-  #       tr(
-  #         th(rowspan = 2, HTML(select_colname)),
-  #         th(rowspan = 2, 'Flag'),
-  #         th(rowspan = 2, 'Country'),
-  #         th(rowspan = 2, "Continent"),
-  #         th(rowspan = 2, 'Region'),
-  #         th(rowspan = 2, 'Income'),
-  #         th(rowspan = 2, 'Date of last update'),
-  #         th(rowspan = 2, 'Does the country have a policy that guides covid-19 testing strategy?', style = "border-right: solid 1px;"),
-  #         
-  #         th(colspan = 2, 'Molecular testing', style = "border-right: solid 1px;"),
-  #         th(colspan = 3, 'Antibody rapid tests', style = "border-right: solid 1px;"),
-  #         th(colspan = 3, 'Antigen rapid tests', style = "border-right: solid 1px;"),
-  #         
-  #         th(rowspan = 2, "Policy Links")
-  #       ),
-  #       tr(
-  #         th('Registered for use'),
-  #         th('Used to confirm diagnosis', style = "border-right: solid 1px;"),
-  #         
-  #         th('Registered for use'),
-  #         th('Used to confirm diagnosis'),
-  #         th('Used for serosurveillance', style = "border-right: solid 1px;"),
-  #         
-  #         th('Registered for use'),
-  #         th('Used to confirm diagnosis'),
-  #         th('Used for the screening of symptomatic patients', style = "border-right: solid 1px;"),
-  #         
-  #         th('Used for the screening of asymptomatic patients'),
-  #         th('Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?'),
-  #         th('Are antigen rapid tests used for testing of health care workers / front line staff?'),
-  #         th('Are antigen rapid tests used for testing at borders /points of entry?'),
-  #         th('Are antigen rapid tests used for testing at schools / workplaces?'),
-  #         th('Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?'),
-  #         th('Who is allowed to use the Ag-RDTs (only health workers etc)?')
-  #       )
-  #     )
-  #   ))
-  #   
-  #   #cols_to_show <- colnames(df) %in% c("Flag", select_colname, input$cb_selected_cols)
-  #   
-  #   # Table
-  #   DT::datatable(df,#[, cols_to_show, with = FALSE],
-  #                 escape = FALSE,
-  #                 rownames = FALSE,
-  #                 class = "display compact stripe",
-  #                 selection = "none",
-  #                 filter = "top",
-  #                 container = table_container,
-  #                 options = list(
-  #                   #dom = "t",
-  #                   #pageLength = 15000,
-  #                   #scrollX = TRUE,
-  #                   #scrollY = "500px",
-  #                   autoWidth = TRUE,
-  #                   columnDefs = list(
-  #                     list(targets = 0, width = '20px', orderable = FALSE, className = 'dt-center'), # Select column
-  #                     list(targets = 1, visible = FALSE), # Flag
-  #                     #list(width = '150px', targets = c(4:ncol(df) - 1)),
-  #                     list(targets = 2, width = "200px", render = flag_render)
-  #                     # list(targets = long_cols_pos - 1, width = "600px")
-  #                   ),
-  #                   order = list(
-  #                     list(2, 'asc')
-  #                   ),
-  #                   # #fixedColumns = list(leftColumns = 1),
-  #                   #
-  #                   # Row selection checkbox
-  #                   preDrawCallback = JS('function() { Shiny.unbindAll(this.api().table().node()); }'),
-  #                   drawCallback = JS('function() { Shiny.bindAll(this.api().table().node()); } ')
-  # 
-  #                 ),
-  #                 extensions = c("FixedColumns")) %>%
-  #     formatStyle(columns = c(1, 2), width = '20px') %>%
-  #     formatStyle(columns = c("Date of last update", "Country", "Continent", "Region", "Income"), "white-space" = "nowrap")
-  # })
-  # 
-  # proxy <- dataTableProxy("tbl_country_list", session = session)
-
-  # Filter columns ------------------------------
-  # observeEvent(input$cb_selected_cols, {
-  #   df <- dx_policy
-  #   cols_to_show <- which(colnames(df) %in% c(input$cb_selected_cols, select_colname)) - 1
-  #   
-  #   DT::showCols(proxy, show = cols_to_show, reset = TRUE)
-  # })
-
-  # Select all rows -----------------------------
-  # observeEvent(input$select_all, {
-  #   req(!is.null(input$select_all))
-  #   
-  #   df <- dx_policy
-  #   if (input$select_all) {
-  #     df[, (select_colname) := shinyInput(checkboxInput, nrow(dx_policy), 'tbl_selection_', value = TRUE)]
-  #   } else {
-  #     df[, (select_colname) := shinyInput(checkboxInput, nrow(dx_policy), 'tbl_selection_', value = FALSE)]
-  #   }
-  # 
-  #   DT::replaceData(proxy, df, resetPaging = FALSE, clearSelection = FALSE, rownames = FALSE)
-  # })
-  
-  # # Row selected
-  # observeEvent(input$tbl_country_list_rows_selected, {
-  #   print(input$tbl_country_list_rows_selected)
-  #   print(isolate(rv$previous_row_selection))
-  #   
-  #   if (length(input$tbl_country_list_rows_selected) > length(isolate(rv$previous_row_selection))) {
-  #     selected_row <- input$tbl_country_list_rows_selected[!input$tbl_country_list_rows_selected %in% isolate(rv$previous_row_selection)]  
-  #   } else {
-  #     selected_row <- isolate(rv$previous_row_selection)[!isolate(rv$previous_row_selection) %in% input$tbl_country_list_rows_selected]
-  #   }
-  #   
-  #   print(selected_row)
-  #   rv$previous_row_selection <- input$tbl_country_list_rows_selected
-  # })
+  # Legend --------------------------------------
+  output$d3_legend <- renderD3( {
+    r2d3(
+      data = list(
+        keys = c('No data', 'No', 'Yes'), 
+        color = c("#cbcbcb", "#cd4651", "#44abb6")
+      ),
+      script = file.path("www", "legend.js"))
+  })
 }
 

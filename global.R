@@ -15,6 +15,8 @@ library(countrycode)
 library(lubridate)
 library(purrr)
 library(sparkline)
+library(r2d3)
+library(openxlsx)
 
 material_dep <- htmltools::htmlDependency(
   name = "material-ui",
