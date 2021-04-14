@@ -48,16 +48,23 @@ function(input, output, session) {
                 ")),
         `Policy Links` = colDef(html = TRUE, minWidth = 1000)
       )
-      # columns_list <- c(
-      #   columns_list, 
-      #   sapply(column_choices$`Molecular testing`, simplify = FALSE, USE.NAMES = TRUE, function(x) {
-      #     colDef(#class = "my-col"
-      #       style = function(value) {
-      #         list(`background-color` = "red")
-      #       }
-      #     )
-      #   })
-      # )
+      columns_list <- c(
+        columns_list,
+        `Does the country have a policy that guides Covid-19 testing strategy?` = list(colDef(
+          style = function(value) {
+            list(`background-color` = "#f7f7f7")
+          },
+          headerStyle = list(`background-color` = "#f7f7f7")
+        )),
+        sapply(column_choices$`Antigen testing`, simplify = FALSE, USE.NAMES = TRUE, function(x) {
+          colDef(
+            style = function(value) {
+              list(`background-color` = "#f7f7f7")
+            },
+            headerStyle = list(`background-color` = "#f7f7f7")
+          )
+        })
+      )
       
       columns_list <- columns_list[names(columns_list) %in% c(colnames(df), "Flag", "Country")]
     } else {
@@ -188,14 +195,16 @@ function(input, output, session) {
     
     columnGroups_list <- list(
       if (length(molecular_testing) > 0) {
-        colGroup(name = "Testing policy", columns = policy_testing)
+        colGroup(name = "Testing policy", columns = policy_testing, 
+                 headerStyle = list(`background-color` = "#f7f7f7"))
       },
       if (length(molecular_testing) > 0) {
         colGroup(name = "Molecular testing", columns = molecular_testing)
       },
       
       if (length(antigen_testing) > 0) {
-        colGroup(name = "Antigen rapid tests", columns = antigen_testing)
+        colGroup(name = "Antigen rapid tests", columns = antigen_testing,
+                 headerStyle = list(`background-color` = "#f7f7f7"))
       },
       
       if (length(antibody_testing) > 0) {
@@ -224,7 +233,8 @@ function(input, output, session) {
                 headerStyle = list(fontWeight = 700, fontSize = "small"),
                 searchInputStyle = list(
                   width = "100%"
-                )
+                ),
+                cellStyle = list(".dark &" = list(borderColor = "rgba(255, 255, 255, 0.15)"))
               ),
               language = reactableLang(
                 searchPlaceholder = "Filter country, continent or income group",
