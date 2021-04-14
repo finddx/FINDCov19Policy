@@ -94,22 +94,6 @@ function(input, output, session) {
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antibody rapid tests registered for use in country?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests registered for use in country?"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Are antibody rapid tests used to confirm a Covid-19 diagnosis?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests used to confirm a Covid-19 diagnosis?"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Are antibody rapid tests used for serosurveillance studies of Covid-19?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests used for serosurveillance studies of Covid-19?"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        
         
         `Are antigen rapid tests registered for use in country?` = colDef(cell = function(value, index) {
           sparkline(df[["Are antigen rapid tests registered for use in country?"]][[index]], 
@@ -160,6 +144,22 @@ function(input, output, session) {
           sparkline(df[["Who is allowed to use the Ag-RDTs (only health workers etc)?"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
+        }),
+        
+        `Are antibody rapid tests registered for use in country?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antibody rapid tests registered for use in country?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
+        }),
+        `Are antibody rapid tests used to confirm a Covid-19 diagnosis?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antibody rapid tests used to confirm a Covid-19 diagnosis?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
+        }),
+        `Are antibody rapid tests used for serosurveillance studies of Covid-19?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antibody rapid tests used for serosurveillance studies of Covid-19?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
         })
       )
       
@@ -169,10 +169,6 @@ function(input, output, session) {
     # Column group list
     molecular_testing <- colnames(df)[colnames(df) %in% c("Is molecular testing registered for use in country?",
                                                           "Is molecular testing used to confirm a Covid-19 diagnosis?")]
-    
-    antibody_testing <- colnames(df)[colnames(df) %in% c("Are antibody rapid tests registered for use in country?",
-                                                         "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
-                                                         "Are antibody rapid tests used for serosurveillance studies of Covid-19?")]
     
     antigen_testing <- colnames(df)[colnames(df) %in% c("Are antigen rapid tests registered for use in country?",
                                                         "Are antigen rapid tests used to confirm Covid-19 diagnosis?",
@@ -185,19 +181,24 @@ function(input, output, session) {
                                                         "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
                                                         "Who is allowed to use the Ag-RDTs (only health workers etc)?")]
     
+    antibody_testing <- colnames(df)[colnames(df) %in% c("Are antibody rapid tests registered for use in country?",
+                                                         "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
+                                                         "Are antibody rapid tests used for serosurveillance studies of Covid-19?")]
+    
     columnGroups_list <- list(
       if (length(molecular_testing) > 0) {
         colGroup(name = "Molecular testing", columns = molecular_testing)
       },
       
-      if (length(antibody_testing) > 0) {
-        colGroup(name = "Antibody rapid tests", columns = antibody_testing)
-      },
-      
       if (length(antigen_testing) > 0) {
         colGroup(name = "Antigen rapid tests", columns = antigen_testing)
+      },
+      
+      if (length(antibody_testing) > 0) {
+        colGroup(name = "Antibody rapid tests", columns = antibody_testing)
       }
     )
+
     columnGroups_list[sapply(columnGroups_list, is.null)] <- NULL
 
     out <- reactable(df,

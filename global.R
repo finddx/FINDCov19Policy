@@ -175,6 +175,13 @@ dx_policy[, (testing_cols) := lapply(.SD, function(x) {
   ifelse(x == "yes", "Yes", x)
 }), .SDcols = testing_cols]
 
+setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update", 
+                         "Does the country have a policy that guides Covid-19 testing strategy?",
+                         column_choices$`Molecular testing`,
+                         column_choices$`Antigen testing`,
+                         column_choices$`Antibody testing`
+))
+
 # Convert columns to factor/date ----------------
 factor_cols <- public_cols[!public_cols %in% c("Policy Links", "Date of last update")]
 dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
