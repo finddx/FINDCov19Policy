@@ -178,12 +178,12 @@ tablerDashPage(
                                        tags$div(class = "info-container",
                                                 prettyCheckbox("cb_show_data", "Show only countries with data", value = TRUE)
                                        ),
-                                       reactable::reactableOutput("tbl_country_list"),
                                        div(style = "margin-top: 10px;",
-                                         conditionalPanel("input.rb_group !== 'Country'",
-                                                          d3Output("d3_legend", width = "100%", height = "80px"),
-                                         )
-                                       )
+                                           conditionalPanel("input.rb_group !== 'Country'",
+                                                            d3Output("d3_legend", width = "100%", height = "80px"),
+                                           )
+                                       ),
+                                       reactable::reactableOutput("tbl_country_list")
                                    )
                                  ),
                                  
