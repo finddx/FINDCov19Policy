@@ -6,8 +6,8 @@ function(input, output, session) {
     
     df <- dx_policy
     
-    # Select only rows to show
-    if (input$cb_show_data) {
+    # Filter out na rows if needed
+    if (input$cb_show_data && input$rb_group == "Country") {
       na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
       df <- df[na_rows == 0]
     }
@@ -41,7 +41,6 @@ function(input, output, session) {
     if (input$rb_group == "Country") {
       columns_list <- list(
         Flag = colDef(show = FALSE),
-        
         Country = colDef(html = TRUE, cell = JS("
                   function(cellInfo) {
                     var elem = cellInfo.row['Flag'] + cellInfo.value
@@ -70,7 +69,9 @@ function(input, output, session) {
       
       columns_list <- columns_list[names(columns_list) %in% c(colnames(df), "Flag", "Country")]
     } else {
+      # Aggregate: Continent/Income Group
       testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
+      
       df <- lapply(na.omit(unique(df[[input$rb_group]])), function(category) {
         ds <- lapply(testing_df_cols, function(col) {
           df2 <- df[get(input$rb_group) == category, ]
@@ -78,7 +79,7 @@ function(input, output, session) {
         })
 
         cbind.data.frame(
-          category,
+          paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
           ds
         )
       }) %>%
@@ -93,6 +94,7 @@ function(input, output, session) {
                     type = "pie", height = "35px")
         }),
         
+        # Molecular
         `Is molecular testing registered for use in country?` = colDef(cell = function(value, index) {
           sparkline(df[["Is molecular testing registered for use in country?"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
@@ -104,6 +106,24 @@ function(input, output, session) {
                     type = "pie", height = "35px")
         }),
         
+        # Antibody
+        `Are antibody rapid tests registered for use in country?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antibody rapid tests registered for use in country?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
+        }),
+        `Are antibody rapid tests used to confirm a Covid-19 diagnosis?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antibody rapid tests used to confirm a Covid-19 diagnosis?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
+        }),
+        `Are antibody rapid tests used for serosurveillance studies of Covid-19?` = colDef(cell = function(value, index) {
+          sparkline(df[["Are antibody rapid tests used for serosurveillance studies of Covid-19?"]][[index]], 
+                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                    type = "pie", height = "35px")
+        }),
+        
+        # Antigen
         `Are antigen rapid tests registered for use in country?` = colDef(cell = function(value, index) {
           sparkline(df[["Are antigen rapid tests registered for use in country?"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
@@ -153,22 +173,6 @@ function(input, output, session) {
           sparkline(df[["Who is allowed to use the Ag-RDTs (only health workers etc)?"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
-        }),
-        
-        `Are antibody rapid tests registered for use in country?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests registered for use in country?"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Are antibody rapid tests used to confirm a Covid-19 diagnosis?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests used to confirm a Covid-19 diagnosis?"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Are antibody rapid tests used for serosurveillance studies of Covid-19?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests used for serosurveillance studies of Covid-19?"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
         })
       )
       
@@ -198,7 +202,7 @@ function(input, output, session) {
     columnGroups_list <- list(
       if (length(molecular_testing) > 0) {
         colGroup(name = "Testing policy", columns = policy_testing, 
-                 headerStyle = list(`background-color` = "#f7f7f7"))
+                 headerStyle = if (input$rb_group == "Country") list(`background-color` = "#f7f7f7"))
       },
       if (length(molecular_testing) > 0) {
         colGroup(name = "Molecular testing", columns = molecular_testing)
@@ -206,7 +210,7 @@ function(input, output, session) {
       
       if (length(antigen_testing) > 0) {
         colGroup(name = "Antigen rapid tests", columns = antigen_testing,
-                 headerStyle = list(`background-color` = "#f7f7f7"))
+                 headerStyle = if (input$rb_group == "Country") list(`background-color` = "#f7f7f7"))
       },
       
       if (length(antibody_testing) > 0) {
@@ -235,8 +239,7 @@ function(input, output, session) {
                 headerStyle = list(fontWeight = 700, fontSize = "small"),
                 searchInputStyle = list(
                   width = "100%"
-                ),
-                cellStyle = list(".dark &" = list(borderColor = "rgba(255, 255, 255, 0.15)"))
+                )
               ),
               language = reactableLang(
                 searchPlaceholder = "Filter country, continent or income group",
@@ -419,6 +422,10 @@ function(input, output, session) {
         categories <- as.character(na.omit(unique(df[[input$rb_group]])))[selected()]
         testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
         
+        # Convert NA to No data
+        df[, (testing_df_cols) := lapply(.SD, function(x) ifelse(is.na(x), "No data", as.character(x))), .SDcols = testing_df_cols]
+        
+        # Aggregation (Yes, No, No data percentages)
         df <- lapply(categories, function(category) {
           ds <- lapply(testing_df_cols, function(col) {
             data.table(
@@ -430,7 +437,7 @@ function(input, output, session) {
           })
           
           cbind.data.frame(
-            category,
+            paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
             ds
           )
         }) %>%

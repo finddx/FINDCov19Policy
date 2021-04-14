@@ -121,9 +121,7 @@ testing_cols <- c("Does the country have a policy that guides Covid-19 testing s
   
                   "Is molecular testing registered for use in country?",
                   "Is molecular testing used to confirm a Covid-19 diagnosis?",
-                  "Are antibody rapid tests registered for use in country?",
-                  "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
-                  "Are antibody rapid tests used for serosurveillance studies of Covid-19?",
+
                   "Are antigen rapid tests registered for use in country?",
                   "Are antigen rapid tests used to confirm Covid-19 diagnosis?",
                   "Are antigen rapid tests used for the testing of symptomatic patients?",
@@ -132,7 +130,11 @@ testing_cols <- c("Does the country have a policy that guides Covid-19 testing s
                   "Are antigen rapid tests used for testing of health care workers / front line staff?",
                   "Are antigen rapid tests used for testing at borders / points of entry?",
                   "Are antigen rapid tests used for testing at schools / workplaces?",
-                  "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?"
+                  "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
+                  
+                  "Are antibody rapid tests registered for use in country?",
+                  "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
+                  "Are antibody rapid tests used for serosurveillance studies of Covid-19?"
 )
 
 column_choices <- list(
