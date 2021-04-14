@@ -167,6 +167,7 @@ function(input, output, session) {
     }
     
     # Column group list
+    policy_testing <- colnames(df)[colnames(df) == "Does the country have a policy that guides Covid-19 testing strategy?"]
     molecular_testing <- colnames(df)[colnames(df) %in% c("Is molecular testing registered for use in country?",
                                                           "Is molecular testing used to confirm a Covid-19 diagnosis?")]
     
@@ -186,6 +187,9 @@ function(input, output, session) {
                                                          "Are antibody rapid tests used for serosurveillance studies of Covid-19?")]
     
     columnGroups_list <- list(
+      if (length(molecular_testing) > 0) {
+        colGroup(name = "Testing policy", columns = policy_testing)
+      },
       if (length(molecular_testing) > 0) {
         colGroup(name = "Molecular testing", columns = molecular_testing)
       },
