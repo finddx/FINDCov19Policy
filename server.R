@@ -11,6 +11,8 @@ function(input, output, session) {
       na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
       df <- df[na_rows == 0]
     }
+    
+    df
   })
   
   observeEvent(input$map_clicked_data, {
