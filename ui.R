@@ -1,7 +1,7 @@
 banner <- HTML('
   <section class="hero"><span class="gradient"></span>
       <div class="content">
-          <h2 class="subtitle underline">Covid-19 Policy</h2>
+          <h2 class="subtitle underline">Covid-19 Diagnostics Policy Mapping Dashboard</h2>
       </div>
   </section>
 ')
@@ -10,8 +10,8 @@ tablerDashPage(
   navbar = tags$div(
     banner
   ),
-  footer = tablerDashFooter(tagList("FIND Covid-19 Policy"), copyrights = "Copyright FIND"),
-  title = "FIND Covid-19 Policy",
+  footer = tablerDashFooter(tagList("Covid-19 Diagnostics Policy Mapping Dashboard"), copyrights = "Copyright FIND"),
+  title = "Covid-19 Diagnostics Policy Mapping Dashboard",
   body = tablerDashBody(
     tags$head(
       # custom CSS
@@ -78,9 +78,24 @@ tablerDashPage(
                                  
                                  fluidRow(
                                    column(width = 12,
-                                          h3(id = "world-view", class = "mt-0 pt-0", "World View",
+                                          h3(id = "about", class = "mt-0 pt-0", "About",
                                              tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "1")))),
-                                          "The map displays data as ...:",
+                                          p(
+                                            paste0("Testing policies offer critical frameworks and guidance for countries ",
+                                                   "to implement their pandemic response. The unprecedented scale and pace of the COVID-19 pandemic ", 
+                                                   "and continuously evolving global context has influenced policy development and dissemination ", 
+                                                   "in a myriad of different ways. While policies may differ, and will continue to evolve, ", 
+                                                   "we believe there is value in centralizing these policies for the benefit of country implementers ", 
+                                                   "and policy makers globally. ")
+                                          ),
+                                          p(
+                                            paste0(
+                                              "This dashboard is designed to provide a global snapshot of ", 
+                                              "COVID testing policy based on publicly available data and documents. ", 
+                                              "We are working to implement regular refreshes of the data, please keep in mind that policies listed here ", 
+                                              "may not be up to date and official government websites and sources should always be considered the most accurate source."
+                                            )
+                                          )
                                    )
                                  ),
                                  
