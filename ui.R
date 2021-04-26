@@ -78,8 +78,7 @@ tablerDashPage(
                                  
                                  fluidRow(
                                    column(width = 12,
-                                          h3(id = "about", class = "mt-0 pt-0", "About",
-                                             tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "1")))),
+                                          h3(id = "about", class = "mt-0 pt-0", "About"),
                                           p(
                                             paste0("Testing policies offer critical frameworks and guidance for countries ",
                                                    "to implement their pandemic response. The unprecedented scale and pace of the COVID-19 pandemic ", 
@@ -101,8 +100,12 @@ tablerDashPage(
                                  
                                  fluidRow(
                                    column(width = 12,
-                                          br(),
-                                          
+                                          h3(id = "world-view", class = "mt-0 pt-0", "World View")
+                                   )
+                                 ),
+                                 
+                                 fluidRow(
+                                   column(width = 12,
                                           tags$div(class = "info-container",
                                                    prettyRadioButtons(
                                                      inputId = "slt_category",
@@ -147,8 +150,8 @@ tablerDashPage(
                                  
                                  fluidRow(
                                    div(class = "col-sm-12",
-                                       h3(id = "compare", "DX Policy Table",
-                                          tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "2")))
+                                       h3(id = "compare", "DX Policy Table"
+                                          #tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "2")))
                                        ),
                                        
                                        p("This table displays the ..."),
