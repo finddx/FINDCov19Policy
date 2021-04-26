@@ -51,7 +51,7 @@ function(input, output, session) {
       )
       columns_list <- c(
         columns_list,
-        `Does the country have a policy that guides Covid-19 testing strategy?` = list(colDef(
+        `Covid-19 testing strategy available` = list(colDef(
           style = function(value) {
             list(`background-color` = "#f7f7f7")
           },
@@ -88,89 +88,89 @@ function(input, output, session) {
       colnames(df) <- c(input$rb_group, testing_df_cols)
       
       columns_list <- list(
-        `Does the country have a policy that guides Covid-19 testing strategy?` = colDef(cell = function(value, index) {
-          sparkline(df[["Does the country have a policy that guides Covid-19 testing strategy?"]][[index]], 
+        `Covid-19 testing strategy available` = colDef(cell = function(value, index) {
+          sparkline(df[["Covid-19 testing strategy available"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
         
         # Molecular
-        `Is molecular testing registered for use in country?` = colDef(cell = function(value, index) {
-          sparkline(df[["Is molecular testing registered for use in country?"]][[index]], 
+        `Molecular test registered in country` = colDef(cell = function(value, index) {
+          sparkline(df[["Molecular test registered in country"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Is molecular testing used to confirm a Covid-19 diagnosis?` = colDef(cell = function(value, index) {
-          sparkline(df[["Is molecular testing used to confirm a Covid-19 diagnosis?"]][[index]], 
+        `Molecular test used to confirm covid-19 diagnosis` = colDef(cell = function(value, index) {
+          sparkline(df[["Molecular test used to confirm covid-19 diagnosis"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
         
         # Antibody
-        `Are antibody rapid tests registered for use in country?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests registered for use in country?"]][[index]], 
+        `Antibody rapid tests registered in country` = colDef(cell = function(value, index) {
+          sparkline(df[["Antibody rapid tests registered in country"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antibody rapid tests used to confirm a Covid-19 diagnosis?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests used to confirm a Covid-19 diagnosis?"]][[index]], 
+        `Antibody rapid tests used to confirm covid-19 diagnosis` = colDef(cell = function(value, index) {
+          sparkline(df[["Antibody rapid tests used to confirm covid-19 diagnosis"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antibody rapid tests used for serosurveillance studies of Covid-19?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antibody rapid tests used for serosurveillance studies of Covid-19?"]][[index]], 
+        `Antibody rapid tests used for serosurveillance studies of covid-19` = colDef(cell = function(value, index) {
+          sparkline(df[["Antibody rapid tests used for serosurveillance studies of covid-19"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
         
         # Antigen
-        `Are antigen rapid tests registered for use in country?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests registered for use in country?"]][[index]], 
+        `Antigen rapid tests registered in country` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests registered in country"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used to confirm Covid-19 diagnosis?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used to confirm Covid-19 diagnosis?"]][[index]], 
+        `Antigen rapid tests used to confirm covid-19 diagnosis` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used to confirm covid-19 diagnosis"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for the testing of symptomatic patients?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for the testing of symptomatic patients?"]][[index]], 
+        `Antigen rapid tests used for testing symptomatic patients` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used for testing symptomatic patients"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for the screening of asymptomatic patients?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for the screening of asymptomatic patients?"]][[index]], 
+        `Antigen rapid tests used for testing asymptomatic patients` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used for testing asymptomatic patients"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?"]][[index]], 
+        `Antigen rapid tests used for contact tracing` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used for contact tracing"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for testing of health care workers / front line staff?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for testing of health care workers / front line staff?"]][[index]], 
+        `Antigen rapid tests used for health care workers` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used for health care workers"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for testing at borders / points of entry?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for testing at borders / points of entry?"]][[index]], 
+        `Antigen rapid tests used at borders` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used at borders"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for testing at schools / workplaces?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for testing at schools / workplaces?"]][[index]], 
+        `Antigen rapid tests used at schools/workplaces` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used at schools/workplaces"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?` = colDef(cell = function(value, index) {
-          sparkline(df[["Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?"]][[index]], 
+        `Antigen rapid tests used for non covid-19 hospitalized patients` = colDef(cell = function(value, index) {
+          sparkline(df[["Antigen rapid tests used for non covid-19 hospitalized patients"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         }),
-        `Who is allowed to use the Ag-RDTs (only health workers etc)?` = colDef(cell = function(value, index) {
-          sparkline(df[["Who is allowed to use the Ag-RDTs (only health workers etc)?"]][[index]], 
+        `Any limitations on who can use antigen rapid tests` = colDef(cell = function(value, index) {
+          sparkline(df[["Any limitations on who can use antigen rapid tests"]][[index]], 
                     sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
                     type = "pie", height = "35px")
         })
@@ -180,24 +180,24 @@ function(input, output, session) {
     }
     
     # Column group list
-    policy_testing <- colnames(df)[colnames(df) == "Does the country have a policy that guides Covid-19 testing strategy?"]
-    molecular_testing <- colnames(df)[colnames(df) %in% c("Is molecular testing registered for use in country?",
-                                                          "Is molecular testing used to confirm a Covid-19 diagnosis?")]
+    policy_testing <- colnames(df)[colnames(df) == "Covid-19 testing strategy available"]
+    molecular_testing <- colnames(df)[colnames(df) %in% c("Molecular test registered in country",
+                                                          "Molecular test used to confirm covid-19 diagnosis")]
     
-    antigen_testing <- colnames(df)[colnames(df) %in% c("Are antigen rapid tests registered for use in country?",
-                                                        "Are antigen rapid tests used to confirm Covid-19 diagnosis?",
-                                                        "Are antigen rapid tests used for the testing of symptomatic patients?",
-                                                        "Are antigen rapid tests used for the screening of asymptomatic patients?",
-                                                        "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
-                                                        "Are antigen rapid tests used for testing of health care workers / front line staff?",
-                                                        "Are antigen rapid tests used for testing at borders / points of entry?",
-                                                        "Are antigen rapid tests used for testing at schools / workplaces?",
-                                                        "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
-                                                        "Who is allowed to use the Ag-RDTs (only health workers etc)?")]
+    antigen_testing <- colnames(df)[colnames(df) %in% c("Antigen rapid tests registered in country",
+                                                        "Antigen rapid tests used to confirm covid-19 diagnosis",
+                                                        "Antigen rapid tests used for testing symptomatic patients",
+                                                        "Antigen rapid tests used for testing asymptomatic patients",
+                                                        "Antigen rapid tests used for contact tracing",
+                                                        "Antigen rapid tests used for health care workers",
+                                                        "Antigen rapid tests used at borders",
+                                                        "Antigen rapid tests used at schools/workplaces",
+                                                        "Antigen rapid tests used for non covid-19 hospitalized patients",
+                                                        "Any limitations on who can use antigen rapid tests")]
     
-    antibody_testing <- colnames(df)[colnames(df) %in% c("Are antibody rapid tests registered for use in country?",
-                                                         "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
-                                                         "Are antibody rapid tests used for serosurveillance studies of Covid-19?")]
+    antibody_testing <- colnames(df)[colnames(df) %in% c("Antibody rapid tests registered in country",
+                                                         "Antibody rapid tests used to confirm covid-19 diagnosis",
+                                                         "Antibody rapid tests used for serosurveillance studies of covid-19")]
     
     columnGroups_list <- list(
       if (length(molecular_testing) > 0) {
@@ -212,7 +212,6 @@ function(input, output, session) {
         colGroup(name = "Antigen rapid tests", columns = antigen_testing,
                  headerStyle = if (input$rb_group == "Country") list(`background-color` = "#f7f7f7"))
       },
-      
       if (length(antibody_testing) > 0) {
         colGroup(name = "Antibody rapid tests", columns = antibody_testing)
       }
@@ -252,7 +251,7 @@ function(input, output, session) {
     )
     
     if (input$rb_group == "Country") {
-      range_filter_cols <- c("Continent", "Income", "Does the country have a policy that guides Covid-19 testing strategy?", testing_cols)
+      range_filter_cols <- c("Continent", "Income", "Covid-19 testing strategy available", testing_cols)
       
       #filter_cols <- which(colnames(df) %in% testing_cols)
       columns_name <- sapply(out$x$tag$attribs$columns, `[[`, "name")
@@ -274,11 +273,11 @@ function(input, output, session) {
     req(input$slt_category)
     
     if (input$slt_category == "Molecular Test") {
-      value <- "Is molecular testing registered for use in country?"
+      value <- "Molecular test registered in country"
     } else if (input$slt_category == "Antigen RDT") {
-      value <- "Are antigen rapid tests registered for use in country?"
+      value <- "Antigen rapid tests registered in country"
     } else if (input$slt_category == "Antibody RDT") {
-      value <- "Are antibody rapid tests registered for use in country?"
+      value <- "Antibody rapid tests registered in country"
     }
     
     theme <- "grey"
@@ -323,9 +322,9 @@ function(input, output, session) {
     )
     # selected_test_cols <- setdiff(
     #   selected_test_cols, 
-    #   c("Is molecular testing registered for use in country?", 
-    #     "Are antibody rapid tests registered for use in country?",
-    #     "Are antigen rapid tests registered for use in country?")
+    #   c("Molecular test registered in country", 
+    #     "Antibody rapid tests registered in country",
+    #     "Antigen rapid tests registered in country")
     # )
     
     df %>%
@@ -382,6 +381,8 @@ function(input, output, session) {
             }
             list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
           } 
+          
+          //var links = (params.data['Policy Links']);
           
           //'</h4>' + '%s' + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + 
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
