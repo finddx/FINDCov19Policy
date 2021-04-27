@@ -1,4 +1,6 @@
 function(input, output, session) {
+  rv <- reactiveValues(selected_on_map = NULL)
+  
   selected <- reactive(getReactableState("tbl_country_list", "selected"))
   
   policy_data <- reactive( {
@@ -15,7 +17,10 @@ function(input, output, session) {
     df
   })
   
+  
   observeEvent(input$map_clicked_data, {
+    rv$selected_on_map <- input$map_clicked_data$name
+    #print(input$map_clicked_data$name)
     # df <- dx_policy
     # if (input$cb_show_data) {
     #   na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
@@ -330,7 +335,7 @@ function(input, output, session) {
     df %>%
       e_charts(name, dispose = FALSE) %>% 
       e_map_("value", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10),
-             selectedMode = "multiple",
+             #selectedMode = "multiple",
              data = purrr::transpose(df)
       ) %>%
       e_visual_map_(
@@ -492,6 +497,83 @@ function(input, output, session) {
         color = c("#cbcbcb", "#cd4651", "#44abb6")
       ),
       script = file.path("www", "legend.js"))
+  })
+  
+  # Country detail ------------------------------
+  output$ui_country_detail <- renderUI( {
+    df_full <- copy(data_map)
+    df_full <- df_full[Country != "Kosovo"]
+    df_full <- e_country_names(df_full, iso2c, name)
+    
+    if (!is.null(rv$selected_on_map)) {
+      df <- df_full[name == rv$selected_on_map, ]
+      
+      selected_test_cols <- switch (input$slt_category,
+                                    `Molecular Test` = column_choices$`Molecular testing`,
+                                    `Antigen RDT` = column_choices$`Antigen testing`,
+                                    `Antibody RDT` = column_choices$`Antibody testing`
+      )
+      
+      test_list <- tags$ul(
+        tagList(
+          lapply(selected_test_cols, function(x) {
+            tags$li(paste0(x, ": "), tags$b(ifelse(is.na(df[[x]]), "No data", df[[x]])))
+          })
+        )
+      )
+      
+      # Gather policy links
+      policy_links_cols <- str_subset(names(df), pattern = "^Policy Links [0-9]+")
+      links_list <- lapply(policy_links_cols, function(x) {
+        df[[x]]
+      })
+      links_list[sapply(links_list, is.na)] <- NULL
+      
+      button_list <- div(lapply(seq_along(links_list), function(i) {
+        tags$a(h4(paste0("Policy #", i), class = "btn btn-default action-button hvr-underline-from-left", 
+                  style = "background-color: #72a6b8; color:white;"), target = "_blank",
+               href = links_list[[i]])
+      }))
+      
+      div(style = "background-color: #4991a3; color: white; padding: 20px;", class = "container",
+          div(class = "row",
+              div(class = "col-sm-6",
+                  p("Select a country on the map to see further details:"),
+                  pickerInput(inputId = "slt_secondary_detail", label = "", inline = TRUE,
+                              choices = df_full$name, selected = isolate(rv$selected_on_map)),
+                  br(),
+                  test_list
+              ),
+              div(class = "col-sm-6",
+                  span(
+                    "Links:", tags$i(class="fas fa-external-link-alt")
+                  ),
+                  tags$br(),
+                  button_list
+              )
+          )
+      )
+    } else {
+      div(style = "background-color: #4991a3; color: white; padding: 20px;", class = "container",
+          div(class = "row",
+              div(class = "col-sm-6",
+                  p("Select a country on the map to see further details:"),
+                  pickerInput(inputId = "slt_secondary_detail", label = "", inline = TRUE,
+                              choices = df_full$name, selected = NULL)
+              ),
+              div(class = "col-sm-6",
+                  span(
+                    "Links:", tags$i(class="fas fa-external-link-alt")
+                  )
+              )
+          )
+      )
+    }
+  })
+  
+  observeEvent(input$slt_secondary_detail, {
+    req(input$slt_secondary_detail)
+    rv$selected_on_map <- input$slt_secondary_detail
   })
 }
 

@@ -31,6 +31,40 @@ tablerDashPage(
         .rt-thead.-filters .rt-tr {align-items: flex-end; height: 60px;}
         .rt-thead.-filters .rt-th {overflow: visible;}
         menuitem {display: block;}
+        
+        .dropdown-menu {
+          z-index: 1000001 !important;
+        }
+        
+        /* Underline From Left */
+        .hvr-underline-from-left {
+          display: inline-block;
+          vertical-align: middle;
+          -webkit-transform: perspective(1px) translateZ(0);
+          transform: perspective(1px) translateZ(0);
+          box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+          position: relative;
+          overflow: hidden;
+        }
+        .hvr-underline-from-left:before {
+          content: '';
+          position: absolute;
+          z-index: -1;
+          left: 0;
+          right: 100%;
+          bottom: 0;
+          background: #5a2259;
+          height: 4px;
+          -webkit-transition-property: right;
+          transition-property: right;
+          -webkit-transition-duration: 0.3s;
+          transition-duration: 0.3s;
+          -webkit-transition-timing-function: ease-out;
+          transition-timing-function: ease-out;
+        }
+        .hvr-underline-from-left:hover:before, .hvr-underline-from-left:focus:before, .hvr-underline-from-left:active:before {
+          right: 0;
+        }
       "),
       
       tags$script(HTML("
@@ -149,6 +183,13 @@ tablerDashPage(
                                  ),
                                  
                                  fluidRow(
+                                   column(width = 12,
+                                          h3(id = "country-detail", class = "mt-0 pt-0", "Country detail"),
+                                          uiOutput("ui_country_detail")
+                                   )
+                                 ),
+                                 
+                                 fluidRow(
                                    div(class = "col-sm-12",
                                        h3(id = "compare", "DX Policy Table"
                                           #tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "2")))
@@ -220,7 +261,7 @@ tablerDashPage(
                                           ),
                                           
                                           p(class = "small", paste0("The data was last updated on: ..."
-                                                                    #format(as.Date("2021-03-23"), "%e-%b-%Y")
+                                                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
                                                                     ))
                                           
                                           
