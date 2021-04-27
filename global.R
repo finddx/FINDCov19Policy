@@ -88,20 +88,20 @@ setnames(dx_policy,
 
 
 
-# Gather Policy Links into one field
-policy_links_cols <- str_subset(names(dx_policy), pattern = "^Policy Links")
-dx_policy[, `Policy Links` := do.call(paste, c(.SD, sep = "<br>")), .SDcols = policy_links_cols]
+## Gather Policy Links into one field
+# policy_links_cols <- str_subset(names(dx_policy), pattern = "^Policy Links")
+# dx_policy[, `Policy Links` := do.call(paste, c(.SD, sep = "<br>")), .SDcols = policy_links_cols]
 
 # Remove extra spaces from colnames
 names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
 
 # Turn policy links into links ------------------
 ## Use <br> for linebreaks
-dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "<br>NA")]
-dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "\\n", replacement = "<br>")]
+# dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "<br>NA")]
+dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "\\n")]
 
 ## Use <a> for links
-dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
+# dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
 
 # Merge continent -------------------------------
 codelist <- setNames(countrycode::codelist[, c("iso2c", "iso3c", "continent", "iso.name.en")], c("iso2c", "iso3c", "Continent", "iso.name.en"))
