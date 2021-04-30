@@ -40,7 +40,17 @@ function(input, output, session) {
     df <- copy(policy_data())
     
     # Select only cols to show
-    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country"), with = FALSE]
+    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", input$rb_group), with = FALSE]
+    
+    policy_testing <- colnames(df)[colnames(df) == "Covid-19 testing strategy available"]
+    molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
+    antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Antigen testing`]
+    antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody testing`]
+    
+    testing_cols_list <- list(policy_testing, molecular_testing, antigen_testing, antibody_testing)
+    gray_columns <- unlist(testing_cols_list[as.logical(cumsum(
+      unlist(lapply(testing_cols_list, length)) > 0
+    ) %% 2)])
     
     # Columns list
     if (input$rb_group == "Country") {
@@ -56,13 +66,7 @@ function(input, output, session) {
       )
       columns_list <- c(
         columns_list,
-        `Covid-19 testing strategy available` = list(colDef(
-          style = function(value) {
-            list(`background-color` = "#f7f7f7")
-          },
-          headerStyle = list(`background-color` = "#f7f7f7")
-        )),
-        sapply(column_choices$`Antigen testing`, simplify = FALSE, USE.NAMES = TRUE, function(x) {
+        sapply(gray_columns, simplify = FALSE, USE.NAMES = TRUE, function(x) {
           colDef(
             style = function(value) {
               list(`background-color` = "#f7f7f7")
@@ -76,149 +80,65 @@ function(input, output, session) {
     } else {
       # Aggregate: Continent/Income Group
       testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
-      
       df <- lapply(na.omit(unique(df[[input$rb_group]])), function(category) {
         ds <- lapply(testing_df_cols, function(col) {
           df2 <- df[get(input$rb_group) == category, ]
           df2[, list(get_table(df2[[col]]))]
         })
-
-        cbind.data.frame(
-          paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
-          ds
-        )
+        
+        if (length(ds) > 0) {
+          cbind.data.frame(
+            paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
+            ds
+          )
+        } else {
+          data.table(paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"))
+        }
       }) %>%
         rbindlist(use.names = FALSE)
       
       colnames(df) <- c(input$rb_group, testing_df_cols)
       
-      columns_list <- list(
-        `Covid-19 testing strategy available` = colDef(cell = function(value, index) {
-          sparkline(df[["Covid-19 testing strategy available"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        
-        # Molecular
-        `Molecular test registered in country` = colDef(cell = function(value, index) {
-          sparkline(df[["Molecular test registered in country"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Molecular test used to confirm covid-19 diagnosis` = colDef(cell = function(value, index) {
-          sparkline(df[["Molecular test used to confirm covid-19 diagnosis"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        
-        # Antibody
-        `Antibody rapid tests registered in country` = colDef(cell = function(value, index) {
-          sparkline(df[["Antibody rapid tests registered in country"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antibody rapid tests used to confirm covid-19 diagnosis` = colDef(cell = function(value, index) {
-          sparkline(df[["Antibody rapid tests used to confirm covid-19 diagnosis"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antibody rapid tests used for serosurveillance studies of covid-19` = colDef(cell = function(value, index) {
-          sparkline(df[["Antibody rapid tests used for serosurveillance studies of covid-19"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        
-        # Antigen
-        `Antigen rapid tests registered in country` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests registered in country"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used to confirm covid-19 diagnosis` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used to confirm covid-19 diagnosis"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used for testing symptomatic patients` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used for testing symptomatic patients"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used for testing asymptomatic patients` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used for testing asymptomatic patients"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used for contact tracing` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used for contact tracing"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used for health care workers` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used for health care workers"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used at borders` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used at borders"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used at schools/workplaces` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used at schools/workplaces"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Antigen rapid tests used for non covid-19 hospitalized patients` = colDef(cell = function(value, index) {
-          sparkline(df[["Antigen rapid tests used for non covid-19 hospitalized patients"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        }),
-        `Any limitations on who can use antigen rapid tests` = colDef(cell = function(value, index) {
-          sparkline(df[["Any limitations on who can use antigen rapid tests"]][[index]], 
-                    sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                    type = "pie", height = "35px")
-        })
-      )
-      
-      columns_list <- columns_list[names(columns_list) %in% colnames(df)]
+      columns_list <- sapply(testing_df_cols, simplify = FALSE, USE.NAMES = TRUE, function(x) {
+        colDef(
+          cell = function(value, index) {
+            sparkline(df[[x]][[index]], 
+                      sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
+                      type = "pie", height = "35px")
+          },
+          style = if (x %in% gray_columns) {
+            function(value) {
+              list(`background-color` = "#f7f7f7")
+            }
+          },
+          headerStyle = if (x %in% gray_columns) {
+            list(`background-color` = "#f7f7f7")
+          }
+        )
+      })
     }
     
     # Column group list
-    policy_testing <- colnames(df)[colnames(df) == "Covid-19 testing strategy available"]
-    molecular_testing <- colnames(df)[colnames(df) %in% c("Molecular test registered in country",
-                                                          "Molecular test used to confirm covid-19 diagnosis")]
-    
-    antigen_testing <- colnames(df)[colnames(df) %in% c("Antigen rapid tests registered in country",
-                                                        "Antigen rapid tests used to confirm covid-19 diagnosis",
-                                                        "Antigen rapid tests used for testing symptomatic patients",
-                                                        "Antigen rapid tests used for testing asymptomatic patients",
-                                                        "Antigen rapid tests used for contact tracing",
-                                                        "Antigen rapid tests used for health care workers",
-                                                        "Antigen rapid tests used at borders",
-                                                        "Antigen rapid tests used at schools/workplaces",
-                                                        "Antigen rapid tests used for non covid-19 hospitalized patients",
-                                                        "Any limitations on who can use antigen rapid tests")]
-    
-    antibody_testing <- colnames(df)[colnames(df) %in% c("Antibody rapid tests registered in country",
-                                                         "Antibody rapid tests used to confirm covid-19 diagnosis",
-                                                         "Antibody rapid tests used for serosurveillance studies of covid-19")]
-    
+    gray_column_groups <- cumsum(
+      unlist(lapply(list(policy_testing, molecular_testing, antigen_testing, antibody_testing), length)) > 0
+    ) %% 2
     columnGroups_list <- list(
-      if (length(molecular_testing) > 0) {
+      if (length(policy_testing) > 0) {
         colGroup(name = "Testing policy", columns = policy_testing, 
-                 headerStyle = if (input$rb_group == "Country") list(`background-color` = "#f7f7f7"))
+                 headerStyle = if (gray_column_groups[1]) list(`background-color` = "#f7f7f7"))
       },
       if (length(molecular_testing) > 0) {
-        colGroup(name = "Molecular testing", columns = molecular_testing)
+        colGroup(name = "Molecular testing", columns = molecular_testing,
+                 headerStyle = if (gray_column_groups[2]) list(`background-color` = "#f7f7f7"))
       },
       
       if (length(antigen_testing) > 0) {
         colGroup(name = "Antigen rapid tests", columns = antigen_testing,
-                 headerStyle = if (input$rb_group == "Country") list(`background-color` = "#f7f7f7"))
+                 headerStyle = if (gray_column_groups[3]) list(`background-color` = "#f7f7f7"))
       },
       if (length(antibody_testing) > 0) {
-        colGroup(name = "Antibody rapid tests", columns = antibody_testing)
+        colGroup(name = "Antibody rapid tests", columns = antibody_testing,
+                 headerStyle = if (gray_column_groups[4]) list(`background-color` = "#f7f7f7"))
       }
     )
 
