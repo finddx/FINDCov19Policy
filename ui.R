@@ -18,11 +18,11 @@ tablerDashPage(
       tags$link(href = "flag-icon.min.css", rel = "stylesheet"),
       tags$link(href = "imperial-urw.css", rel = "stylesheet"),
       tags$link(href = "style.css", rel = "stylesheet"),
-      
+
       # tags$link(href='https://fonts.googleapis.com/css?family=Lato:400,700,300,900'),
       tags$link(href="https://fonts.googleapis.com/css2?family=Roboto:300"),
-      
-      
+
+
       reactR::html_dependency_react(),
       reactR::html_dependency_reacttools(),
       htmlwidgets::getDependency("reactable","reactable"),
@@ -31,11 +31,11 @@ tablerDashPage(
         .rt-thead.-filters .rt-tr {align-items: flex-end; height: 60px;}
         .rt-thead.-filters .rt-th {overflow: visible;}
         menuitem {display: block;}
-        
+
         .dropdown-menu {
           z-index: 1000001 !important;
         }
-        
+
         /* Underline From Left */
         .hvr-underline-from-left {
           display: inline-block;
@@ -66,7 +66,7 @@ tablerDashPage(
           right: 0;
         }
       "),
-      
+
       tags$script(HTML("
         function filterRange(filter, rows) {
           return rows.filter(function(row) {
@@ -74,14 +74,14 @@ tablerDashPage(
             if (row._subRows) {
               return true;
             }
-  
+
             if (filter.value == '') {
               return true;
             }
             return row[filter.id] == filter.value;
           })
         }
-        
+
         function inputFilter(filter) {
           var _onChange = filter.onChange;
           return React.createElement(
@@ -109,42 +109,42 @@ tablerDashPage(
       tags$div(class="col-md-12",
                tags$div(class="card ",
                         tags$div(class="card-body",
-                                 
+
                                  fluidRow(
                                    column(width = 12,
                                           h3(id = "about", class = "mt-0 pt-0", "About"),
                                           p(
                                             paste0("Testing policies offer critical frameworks and guidance for countries ",
-                                                   "to implement their pandemic response. The unprecedented scale and pace of the COVID-19 pandemic ", 
-                                                   "and continuously evolving global context has influenced policy development and dissemination ", 
-                                                   "in a myriad of different ways. While policies may differ, and will continue to evolve, ", 
-                                                   "we believe there is value in centralizing these policies for the benefit of country implementers ", 
+                                                   "to implement their pandemic response. The unprecedented scale and pace of the COVID-19 pandemic ",
+                                                   "and continuously evolving global context has influenced policy development and dissemination ",
+                                                   "in a myriad of different ways. While policies may differ, and will continue to evolve, ",
+                                                   "we believe there is value in centralizing these policies for the benefit of country implementers ",
                                                    "and policy makers globally. ")
                                           ),
                                           p(
                                             paste0(
-                                              "This dashboard is designed to provide a global snapshot of ", 
-                                              "COVID testing policy based on publicly available data and documents. ", 
-                                              "We are working to implement regular refreshes of the data, please keep in mind that policies listed here ", 
+                                              "This dashboard is designed to provide a global snapshot of ",
+                                              "COVID testing policy based on publicly available data and documents. ",
+                                              "We are working to implement regular refreshes of the data, please keep in mind that policies listed here ",
                                               "may not be up to date and official government websites and sources should always be considered the most accurate source."
                                             )
                                           )
                                    )
                                  ),
-                                 
+
                                  fluidRow(
                                    column(width = 12,
                                           h3(id = "world-view", class = "mt-0 pt-0", "World View")
                                    )
                                  ),
-                                 
+
                                  fluidRow(
                                    column(width = 12,
                                           tags$div(class = "info-container",
                                                    prettyRadioButtons(
                                                      inputId = "slt_category",
-                                                     label = NULL, 
-                                                     choices = c("Molecular Test", "Antigen RDT", "Antibody RDT"), 
+                                                     label = NULL,
+                                                     choices = c("Molecular Test", "Antigen RDT", "Antibody RDT"),
                                                      status = "default",
                                                      inline = TRUE
                                                    ),
@@ -157,9 +157,9 @@ tablerDashPage(
                                                      )
                                                    )
                                           ),
-                                          
+
                                           echarts4rOutput("map", height = "450px"),
-                                          
+
                                           tags$div(class = "info-container", style = "margin-top: -50px;",
                                                    prettySwitch(
                                                      inputId = "i_roam",
@@ -181,23 +181,23 @@ tablerDashPage(
                                           )
                                    )
                                  ),
-                                 
+
                                  fluidRow(
                                    column(width = 12,
                                           h3(id = "country-detail", class = "mt-0 pt-0", "Country detail"),
                                           uiOutput("ui_country_detail")
                                    )
                                  ),
-                                 
+
                                  fluidRow(
                                    div(class = "col-sm-12",
                                        h3(id = "compare", "DX Policy Table"
                                           #tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "2")))
                                        ),
-                                       
+
                                        p("This table displays the ..."),
                                        br(),
-                                       
+
                                        tags$div(class = "info-container",
                                                 prettyRadioButtons(
                                                   inputId = "rb_group",
@@ -219,18 +219,18 @@ tablerDashPage(
                                                   )
                                                 )
                                        ),
-                                       
+
                                        tags$div(class = "info-container",
                                                 pickerInput(
                                                   inputId = "cb_selected_cols",
-                                                  label = "Select columns to show", 
+                                                  label = "Select columns to show",
                                                   multiple = TRUE,
                                                   options = list(
                                                     `actions-box` = TRUE,
                                                     size = 8,
                                                     `selected-text-format` = "count > 3"
                                                   ),
-                                                  choices = column_choices, 
+                                                  choices = column_choices,
                                                   selected = default_cols
                                                 )
                                        ),
@@ -245,7 +245,7 @@ tablerDashPage(
                                        reactable::reactableOutput("tbl_country_list")
                                    )
                                  ),
-                                 
+
                                  fluidRow(
                                    column(width = 12,
                                           br(),
@@ -259,18 +259,18 @@ tablerDashPage(
                                             "All data is available on our ",
                                             a(href = "https://github.com/dsbbfinddx/data/tree/master/processed", target="_blank", "GitHub Repository.")
                                           ),
-                                          
-                                          p(class = "small", paste0("The data was last updated on: ..."
+
+                                          p(class = "small", paste0("The data was last updated on: ",
                                                                     format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
                                                                     ))
-                                          
-                                          
+
+
                                    )
                                  )
                         )
                )
       )
-      
+
     )
   )
 )
