@@ -40,7 +40,7 @@ function(input, output, session) {
     df <- copy(policy_data())
     
     # Select only cols to show
-    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country"), with = FALSE]
+    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", input$rb_group), with = FALSE]
     
     policy_testing <- colnames(df)[colnames(df) == "Covid-19 testing strategy available"]
     molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
