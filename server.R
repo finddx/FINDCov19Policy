@@ -80,17 +80,20 @@ function(input, output, session) {
     } else {
       # Aggregate: Continent/Income Group
       testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
-      
       df <- lapply(na.omit(unique(df[[input$rb_group]])), function(category) {
         ds <- lapply(testing_df_cols, function(col) {
           df2 <- df[get(input$rb_group) == category, ]
           df2[, list(get_table(df2[[col]]))]
         })
-
-        cbind.data.frame(
-          paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
-          ds
-        )
+        
+        if (length(ds) > 0) {
+          cbind.data.frame(
+            paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
+            ds
+          )
+        } else {
+          data.table(paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"))
+        }
       }) %>%
         rbindlist(use.names = FALSE)
       
