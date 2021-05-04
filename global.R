@@ -99,9 +99,6 @@ names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacemen
 # dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "<br>NA")]
 #dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "\\n")]
 dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(\\r)*\\n", replacement = "<br>")]
-
-
-# Use <a> for links
 dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
 
 # Merge continent -------------------------------
