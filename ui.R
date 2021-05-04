@@ -65,6 +65,19 @@ tablerDashPage(
         .hvr-underline-from-left:hover:before, .hvr-underline-from-left:focus:before, .hvr-underline-from-left:active:before {
           right: 0;
         }
+        
+        #rb_group .shiny-options-group {
+          height: auto;
+          width: 250px;
+          -webkit-column-count: 2;
+          -moz-column-count: 2;
+          column-count: 2;
+          -webkit-column-fill: balance;
+          -moz-column-fill: balance;
+          column-fill: balance;
+          margin-top: 0px;
+          margin-right: 100px;
+        }
       "),
 
       tags$script(HTML("
@@ -205,9 +218,9 @@ tablerDashPage(
                                                   status = "default",
                                                   inline = TRUE,
                                                   choices = c(
-                                                    "by country" = "Country",
                                                     "by continent" = "Continent",
-                                                    "by income group" = "Income"
+                                                    "by country details" = "Country",
+                                                    "by income group aggregation" = "Income"
                                                   )
                                                 ),
                                                 tags$span(
