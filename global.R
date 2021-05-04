@@ -17,6 +17,7 @@ library(purrr)
 library(sparkline)
 library(r2d3)
 library(openxlsx)
+library(urltools)
 
 material_dep <- htmltools::htmlDependency(
   name = "material-ui",
