@@ -86,11 +86,16 @@ setnames(dx_policy,
            "Antibody rapid tests used for serosurveillance studies of covid-19"
          ))
 
-
-
 # Remove extra whitespace from policy links
 policy_links_cols <- str_subset(names(dx_policy), pattern = "^Policy Links [0-9]+")
-dx_policy[, lapply(.SD, str_remove_all, pattern = "\\r\\n"), .SDcols = policy_links_cols]
+dx_policy[, (policy_links_cols) := lapply(.SD, str_remove_all, pattern = "\\r\\n"), .SDcols = policy_links_cols]
+
+# Remove invalid links
+dx_policy[, (policy_links_cols) := lapply(.SD, function(x) ifelse(is_valid_url(x), x, NA_character_)), .SDcols = policy_links_cols]
+
+# Keep only the link part
+dx_policy[, (policy_links_cols) := lapply(.SD, get_url), .SDcols = policy_links_cols]
+
 
 # Remove extra spaces from colnames
 names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
