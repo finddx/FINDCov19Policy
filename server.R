@@ -237,7 +237,8 @@ function(input, output, session) {
     label[sapply(label, is.null)] <- NULL
     
     df$value <- df[[value]]
-    df[, value := value_lookup[ifelse(is.na(value), "No data", value)]]
+    df[, value := ifelse(is.na(df$value), "No data", df$value)]
+    df[, value := value_lookup[df$value]]
 
     selected_test_cols <- switch (input$slt_category,
       `Molecular Test` = column_choices$`Molecular testing`,
