@@ -19,6 +19,9 @@ library(r2d3)
 library(openxlsx)
 library(urltools)
 
+# Set locale to English for date formatting
+Sys.setlocale("LC_ALL","English")
+
 material_dep <- htmltools::htmlDependency(
   name = "material-ui",
   version = "4.6.1",
