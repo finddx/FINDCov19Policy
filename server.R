@@ -460,7 +460,7 @@ function(input, output, session) {
               div(class = "col-sm-6",
                   p("Select a country on the map to see further details:"),
                   pickerInput(inputId = "slt_secondary_detail", label = "", inline = TRUE,
-                              choices = df_full$name, selected = isolate(rv$selected_on_map)),
+                              choices = sort(df_full$name), selected = isolate(rv$selected_on_map)),
                   br(),
                   test_list
               ),
@@ -479,7 +479,7 @@ function(input, output, session) {
               div(class = "col-sm-6",
                   p("Select a country on the map to see further details:"),
                   pickerInput(inputId = "slt_secondary_detail", label = "", inline = TRUE,
-                              choices = df_full$name, selected = NULL)
+                              choices = sort(df_full$name), selected = NULL)
               ),
               div(class = "col-sm-6",
                   span(
@@ -493,7 +493,7 @@ function(input, output, session) {
   
   observeEvent(input$slt_secondary_detail, {
     req(input$slt_secondary_detail)
+    
     rv$selected_on_map <- input$slt_secondary_detail
   })
 }
-
