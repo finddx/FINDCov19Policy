@@ -1,7 +1,7 @@
 banner <- HTML('
   <section class="hero"><span class="gradient"></span>
       <div class="content">
-          <h2 class="subtitle underline">Covid-19 Diagnostics Policy Mapping Dashboard</h2>
+          <h2 class="subtitle underline">Tests registered in the country</h2>
       </div>
   </section>
 ')
@@ -10,8 +10,8 @@ tablerDashPage(
   navbar = tags$div(
     banner
   ),
-  footer = tablerDashFooter(tagList("Covid-19 Diagnostics Policy Mapping Dashboard"), copyrights = "Copyright FIND"),
-  title = "Covid-19 Diagnostics Policy Mapping Dashboard",
+  footer = tablerDashFooter(tagList("Tests registered in the country"), copyrights = "Copyright FIND"),
+  title = "Tests registered in the country",
   body = tablerDashBody(
     tags$head(
       # custom CSS
