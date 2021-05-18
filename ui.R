@@ -204,12 +204,11 @@ tablerDashPage(
 
                                  fluidRow(
                                    div(class = "col-sm-12",
-                                       h3(id = "compare", "DX Policy Table"
+                                       h3(id = "compare", "DX by Diagnostic"
                                           #tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "2")))
                                        ),
 
                                        p("This table displays the ..."),
-                                       br(),
 
                                        tags$div(class = "info-container",
                                                 prettyRadioButtons(
