@@ -223,7 +223,6 @@ function(input, output, session) {
       }
     )
     
-    #label <- get_label(df[[value]])
     label <- list(
       if ("No data" %in% df[[value]]) {
         list(min = 1, max = 1, label = "No data")
@@ -242,15 +241,9 @@ function(input, output, session) {
 
     selected_test_cols <- switch (input$slt_category,
       `Molecular Test` = column_choices$`Molecular testing`,
-      `Antigen RDT` = column_choices$`Antigen testing`,
+      `Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen rapid tests"),
       `Antibody RDT` = column_choices$`Antibody testing`
     )
-    # selected_test_cols <- setdiff(
-    #   selected_test_cols, 
-    #   c("Molecular test registered in country", 
-    #     "Antibody rapid tests registered in country",
-    #     "Antigen rapid tests registered in country")
-    # )
     
     df %>%
       e_charts(name, dispose = FALSE) %>% 
@@ -267,13 +260,6 @@ function(input, output, session) {
         pieces = label,
         
         inRange = list(color = colors), # scale colors
-        # splitList = list(
-        #   list(min = 1, max = 1),
-        #   list(min = 2, max = 2),
-        #   list(min = 3, max = 3)
-        # )
-        # splitList = split_list(r_outcome_info()$split_list),
-        # precision = if (r_outcome_info()$split_list == "tiny") 1 else 0
       ) %>%
       e_theme(theme) %>%
       e_tooltip(formatter = htmlwidgets::JS(sprintf("
@@ -312,15 +298,15 @@ function(input, output, session) {
           //'</h4>' + '%s' + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + 
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }
-      ", paste0(selected_test_cols, collapse = "|"), value)), 
-                position = JS("function (pos, params, dom, rect, size) {
-                  // tooltip will be fixed on the right if mouse hovering on the left,
-                  // and on the left if hovering on the right.
-                  var obj = {top: 60};
-                  obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
-                  return obj;
-                }"),
-                backgroundColor = 'rgba(255, 255, 255, 0.6)'
+      ", paste0(selected_test_cols, collapse = "|"), value))#, 
+                # position = JS("function (pos, params, dom, rect, size) {
+                #   // tooltip will be fixed on the right if mouse hovering on the left,
+                #   // and on the left if hovering on the right.
+                #   var obj = {top: 60};
+                #   obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
+                #   return obj;
+                # }"),
+                # backgroundColor = 'rgba(255, 255, 255, 0.6)'
       )
   })
   
