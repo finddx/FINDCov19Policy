@@ -110,6 +110,12 @@ names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacemen
 dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(\\r)*\\n", replacement = "<br>")]
 dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
 
+# Tests registered in country mappings
+tests_col <- c("Molecular test registered in country", "Antibody rapid tests registered in country", 
+               "Antigen rapid tests registered in country")
+
+dx_policy[, (tests_col) := lapply(.SD, plyr::mapvalues, from = c("No, but used", "In the process of registration"), to = c("No", "No")), .SDcols = tests_col]
+
 # Merge continent -------------------------------
 codelist <- setNames(countrycode::codelist[, c("iso2c", "iso3c", "continent", "iso.name.en")], c("iso2c", "iso3c", "Continent", "iso.name.en"))
 codelist <- codelist[!is.na(codelist$iso.name.en), ]
