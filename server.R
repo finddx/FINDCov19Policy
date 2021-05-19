@@ -210,7 +210,41 @@ function(input, output, session) {
     df <- copy(data_map)
     df <- df[Country != "Kosovo"]
     df <- e_country_names(df, iso2c, name)
-
+    
+    # Adjust country names
+    df[, name := dplyr::recode(name,
+                         "Congo - Kinshasa" = "Dem. Rep. Congo",
+                         "Congo - Brazzaville" = "Congo",
+                         "Central African Republic" = "Central African Rep.",
+                         "South Sudan" = "S. Sudan",
+                         "North Korea" = "Dem. Rep. Korea",
+                         "South Korea" = "Korea",
+                         "Western Sahara" = "W. Sahara",
+                         "Myanmar (Burma)" = "Myanmar",
+                         "Laos" = "Lao PDR",
+                         "Côte d’Ivoire" = "Côte d'Ivoire",
+                         "Czechia" = "Czech Rep.",
+                         "Equatorial Guinea" = "Eq. Guinea",
+                         "Eswatini" = "Swaziland",
+                         "Falkland Islands" = "Falkland Is.",
+                         "South Georgia & South Sandwich Islands" = "S. Geo. and S. Sandw. Is.",
+                         "French Southern Territories" = "Fr. S. Antarctic Lands",
+                         "British Indian Ocean Territory" = "Br. Indian Ocean Ter.",
+                         "Solomon Islands" = "Solomon Is.",
+                         "Dominican Republic" = "Dominican Rep.",
+                         "Bosnia & Herzegovina" = "Bosnia and Herz.",
+                         "North Macedonia" = "Macedonia",
+                         "Heard & McDonald Islands" = "Heard I. and McDonald Is.",
+                         "Micronesia (Federated States of)" = "Micronesia",
+                         "Trinidad & Tobago" = "Trinidad and Tobago",
+                         "St. Vincent & Grenadines" = "St. Vin. and Gren.",
+                         "St. Lucia" = "Saint Lucia",
+                         "Antigua & Barbuda" = "Antigua",
+                         "U.S. Virgin Islands" = "U.S. Virgin Is.",
+                         "Faroe Islands" = "Faeroe Is.",
+                         "Åland Islands" = "Aland"
+    )]
+    
     colors <- c(
       if ("No data" %in% df[[value]]) {
         "#cbcbcb"
