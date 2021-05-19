@@ -113,12 +113,6 @@ dx_policy[, (policy_links_cols) := lapply(.SD, get_url), .SDcols = policy_links_
 dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(\\r)*\\n", replacement = "<br>")]
 dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
 
-# Tests registered in country mappings
-tests_col <- c("Molecular test registered in country", "Antibody rapid tests registered in country", 
-               "Antigen rapid tests registered in country")
-
-dx_policy[, (tests_col) := lapply(.SD, plyr::mapvalues, from = c("No, but used", "In the process of registration"), to = c("No", "No")), .SDcols = tests_col]
-
 # Merge continent -------------------------------
 codelist <- setNames(countrycode::codelist[, c("iso2c", "iso3c", "continent", "iso.name.en")], c("iso2c", "iso3c", "Continent", "iso.name.en"))
 codelist <- codelist[!is.na(codelist$iso.name.en), ]
@@ -256,4 +250,4 @@ factor_cols <- public_cols[!public_cols %in% c("Policy Links", "Date of last upd
 dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
 dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 
-value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No" = 2, "Yes" = 3)
+value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 1, "In the process of registration" = 1, "No" = 2, "Yes" = 3)

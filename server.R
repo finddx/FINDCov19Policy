@@ -80,6 +80,15 @@ function(input, output, session) {
     } else {
       # Aggregate: Continent/Income Group
       testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
+      
+      # Convert values
+      df[, (testing_df_cols) := lapply(.SD, plyr::mapvalues, 
+                                       from = c("No, but used", "In the process of registration", "No Data"), 
+                                       to = c("No", "No", "No data")), .SDcols = testing_df_cols]
+      
+      # Convert NA to No data
+      df[, (testing_df_cols) := lapply(.SD, function(x) ifelse(is.na(x), "No data", as.character(x))), .SDcols = testing_df_cols]
+      
       df <- lapply(na.omit(unique(df[[input$rb_group]])), function(category) {
         ds <- lapply(testing_df_cols, function(col) {
           df2 <- df[get(input$rb_group) == category, ]
@@ -368,6 +377,11 @@ function(input, output, session) {
         # Continent / Income group
         categories <- as.character(na.omit(unique(df[[input$rb_group]])))[selected()]
         testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
+        
+        # Convert values
+        df[, (testing_df_cols) := lapply(.SD, plyr::mapvalues, 
+                                                from = c("No, but used", "In the process of registration", "No Data"), 
+                                                to = c("No", "No", "No data")), .SDcols = testing_df_cols]
         
         # Convert NA to No data
         df[, (testing_df_cols) := lapply(.SD, function(x) ifelse(is.na(x), "No data", as.character(x))), .SDcols = testing_df_cols]
