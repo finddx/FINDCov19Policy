@@ -217,7 +217,7 @@ tablerDashPage(
                                                   status = "default",
                                                   inline = TRUE,
                                                   choices = c(
-                                                    "by continent" = "Continent",
+                                                    "by continent, or" = "Continent",
                                                     "by country details" = "Country",
                                                     "by income group aggregation" = "Income"
                                                   )
