@@ -250,4 +250,4 @@ factor_cols <- public_cols[!public_cols %in% c("Policy Links", "Date of last upd
 dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
 dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 
-value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 1, "In the process of registration" = 1, "No" = 2, "Yes" = 3)
+value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 1, "In the process of registration" = 2, "No" = 2, "Yes" = 3)
