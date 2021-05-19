@@ -471,7 +471,8 @@ function(input, output, session) {
       links_list[sapply(links_list, is.na)] <- NULL
       
       button_list <- div(lapply(seq_along(links_list), function(i) {
-        tags$a(h4(domain(links_list[[i]]), class = "btn btn-default action-button hvr-underline-from-left", 
+        lnk <- str_remove_all(domain(links_list[[i]]), pattern = "^www\\.") 
+        tags$a(h4(lnk, class = "btn btn-default action-button hvr-underline-from-left", 
                   style = "background-color: #72a6b8; color:white;"), target = "_blank",
                href = links_list[[i]])
       }))
