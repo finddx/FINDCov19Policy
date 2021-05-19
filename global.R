@@ -20,7 +20,8 @@ library(openxlsx)
 library(urltools)
 
 # Set locale to English for date formatting
-Sys.setlocale("LC_ALL","English")
+#Sys.setlocale("LC_ALL","English")
+Sys.setlocale("LC_TIME", "C")
 
 material_dep <- htmltools::htmlDependency(
   name = "material-ui",
