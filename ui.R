@@ -147,7 +147,7 @@ tablerDashPage(
 
                                  fluidRow(
                                    column(width = 12,
-                                          h3(id = "world-view", class = "mt-0 pt-0", "Tests registered in the country")
+                                          h3(id = "world-view", class = "mt-0 pt-0", "Tests registered in the country?")
                                    )
                                  ),
 
