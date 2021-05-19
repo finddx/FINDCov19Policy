@@ -47,6 +47,12 @@ setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
 dx_policy[, `Notes` := NULL]
 
+# Remove extra spaces from colnames
+names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
+
+# Covid case sensitivity
+names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("covid-19", ignore_case = TRUE), replacement = "Covid-19")
+
 # Simplify questions
 setnames(dx_policy,
          old = c(
@@ -62,7 +68,7 @@ setnames(dx_policy,
            "Are antigen rapid tests used for testing of health care workers / front line staff?",
            "Are antigen rapid tests used for testing at borders / points of entry?",
            "Are antigen rapid tests used for testing at schools / workplaces?",
-           "Are antigen rapid tests used for testing for non covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
+           "Are antigen rapid tests used for testing for non Covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
            "Who is allowed to use the Ag-RDTs (only health workers etc)?",
 
            "Are antibody rapid tests registered for use in country?",
@@ -99,10 +105,6 @@ dx_policy[, (policy_links_cols) := lapply(.SD, function(x) ifelse(is_valid_url(x
 
 # Keep only the link part
 dx_policy[, (policy_links_cols) := lapply(.SD, get_url), .SDcols = policy_links_cols]
-
-
-# Remove extra spaces from colnames
-names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
 
 # Turn policy links into links ------------------
 ## Use <br> for linebreaks
