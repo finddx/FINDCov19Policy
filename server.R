@@ -217,31 +217,37 @@ function(input, output, session) {
     theme <- "grey"
     
     df <- copy(data_map)
-    df <- df[Country != "Kosovo"]
+    #df <- df[Country != "Kosovo"]
     df <- e_country_names(df, iso2c, name)
-    
+    df[Country == "Kosovo", name := "Kosovo"]
     # Adjust country names
     df[, name := dplyr::recode(name,
-                         "Congo - Kinshasa" = "Dem. Rep. Congo",
-                         "Congo - Brazzaville" = "Congo",
-                         "Central African Republic" = "Central African Rep.",
-                         "South Sudan" = "S. Sudan",
-                         "North Korea" = "Dem. Rep. Korea",
-                         "South Korea" = "Korea",
-                         "Western Sahara" = "W. Sahara",
+                         "Bahamas" = "The Bahamas",
+                         "Dominican Rep." = "Dominican Republic",
+                         "Tanzania" = "United Republic of Tanzania",
+                         "Eq. Guinea" = "Equatorial Guinea",
+                         "Timor-Leste" = "East Timor",
+                         "Solomon Is." = "Solomon Islands",
+                         "United States" = "United States of America",
+                         "Dem. Rep. Congo" = "Democratic Republic of the Congo",
+                         "Congo" = "Republic of the Congo",
+                         "W. Sahara" = "Western Sahara",
+                         "S. Sudan" = "South Sudan",
+                         "Korea" = "North Korea",
+                         "Dem. Rep. Korea" = "South Korea",
+                         "Guinea-Bissau" = "Guinea Bissau",
+                         "Serbia" = "Republic of Serbia",
+                         
                          "Myanmar (Burma)" = "Myanmar",
                          "Laos" = "Lao PDR",
-                         "Côte d’Ivoire" = "Côte d'Ivoire",
-                         "Czechia" = "Czech Rep.",
-                         "Equatorial Guinea" = "Eq. Guinea",
+                         "Côte d’Ivoire" = "Ivory Coast",
+                         "Czech Rep." = "Czech Republic",
                          "Eswatini" = "Swaziland",
                          "Falkland Islands" = "Falkland Is.",
                          "South Georgia & South Sandwich Islands" = "S. Geo. and S. Sandw. Is.",
-                         "French Southern Territories" = "Fr. S. Antarctic Lands",
+                         "French Southern Territories" = "French Southern and Antarctic Lands",
                          "British Indian Ocean Territory" = "Br. Indian Ocean Ter.",
-                         "Solomon Islands" = "Solomon Is.",
-                         "Dominican Republic" = "Dominican Rep.",
-                         "Bosnia & Herzegovina" = "Bosnia and Herz.",
+                         "Bosnia and Herz." = "Bosnia and Herzegovina",
                          "North Macedonia" = "Macedonia",
                          "Heard & McDonald Islands" = "Heard I. and McDonald Is.",
                          "Micronesia (Federated States of)" = "Micronesia",
@@ -251,7 +257,8 @@ function(input, output, session) {
                          "Antigua & Barbuda" = "Antigua",
                          "U.S. Virgin Islands" = "U.S. Virgin Is.",
                          "Faroe Islands" = "Faeroe Is.",
-                         "Åland Islands" = "Aland"
+                         "Åland Islands" = "Aland",
+                         "Central African Rep." = "Central African Republic"
     )]
     
     colors <- c(
@@ -291,10 +298,12 @@ function(input, output, session) {
     
     df %>%
       e_charts(name, dispose = FALSE) %>% 
-      e_map_("value", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10),
-             #selectedMode = "multiple",
-             data = purrr::transpose(df)
-      ) %>%
+      e_map_register("WORLD", geojson) %>% 
+      e_map(map = "WORLD", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10), data = purrr::transpose(df)) %>% 
+      # e_map_("value", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10),
+      #        #selectedMode = "multiple",
+      #        data = purrr::transpose(df)
+      # ) %>%
       e_visual_map_(
         "value",
         type = "piecewise",
@@ -457,7 +466,7 @@ function(input, output, session) {
   # Country detail ------------------------------
   output$ui_country_detail <- renderUI( {
     df_full <- copy(data_map)
-    df_full <- df_full[Country != "Kosovo"]
+    #df_full <- df_full[Country != "Kosovo"]
     df_full <- e_country_names(df_full, iso2c, name)
     
     if (!is.null(rv$selected_on_map)) {
