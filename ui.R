@@ -11,7 +11,7 @@ tablerDashPage(
     banner
   ),
   footer = tablerDashFooter(tagList("COVID-19 Diagnostics Policy Mapping Dashboard"), copyrights = "Copyright FIND"),
-  title = "COVID-19 Diagnostics Policy Mapping Dashboard",
+  title = "Country testing policies",
   body = tablerDashBody(
     tags$head(
       # custom CSS
@@ -125,21 +125,21 @@ tablerDashPage(
 
                                  fluidRow(
                                    column(width = 12,
-                                          h3(id = "about", class = "mt-0 pt-0", "About"),
+                                          h3(id = "about", class = "mt-0 pt-0", ""),
                                           p(
                                             paste0("Testing policies offer critical frameworks and guidance for countries ",
                                                    "to implement their pandemic response. The unprecedented scale and pace of the COVID-19 pandemic ",
                                                    "and continuously evolving global context has influenced policy development and dissemination ",
-                                                   "in a myriad of different ways. While policies may differ, and will continue to evolve, ",
+                                                   "in many different ways. While policies may differ, and will continue to evolve, ",
                                                    "we believe there is value in centralizing these policies for the benefit of country implementers ",
                                                    "and policy makers globally. ")
                                           ),
                                           p(
                                             paste0(
                                               "This dashboard is designed to provide a global snapshot of ",
-                                              "COVID testing policy based on publicly available data and documents. ",
+                                              "COVID-19 testing policy based on publicly available data and documents. ",
                                               "We are working to implement regular refreshes of the data, please keep in mind that policies listed here ",
-                                              "may not be up to date and official government websites and sources should always be considered the most accurate source."
+                                              "may not be up-to-date and official government websites and ressources should always be considered the most accurate source."
                                             )
                                           )
                                    )
@@ -147,7 +147,7 @@ tablerDashPage(
 
                                  fluidRow(
                                    column(width = 12,
-                                          h3(id = "world-view", class = "mt-0 pt-0", "Tests registered in the country?")
+                                          h3(id = "world-view", class = "mt-0 pt-0", "Are tests registered in the country?")
                                    )
                                  ),
 
@@ -208,7 +208,7 @@ tablerDashPage(
                                           #tags$sup(a(a(style = "color: #aaa; font-weight: 400; margin-left: 0px;   z-index: 1000000 !important; font-size: 23px; ", "2")))
                                        ),
 
-                                       p("This table displays the ..."),
+                                       p("The table below displays diagnostics policy data:"),
 
                                        tags$div(class = "info-container",
                                                 prettyRadioButtons(
@@ -258,27 +258,27 @@ tablerDashPage(
                                    )
                                  ),
 
-                                 fluidRow(
-                                   column(width = 12,
-                                          br(),
-                                          h3("Download the data"),
-                                          p("The selected data can be downloaded from", downloadLink("lnk_download_selected", label = "here.")),
-                                          p("All data is available through stable links as ",
-                                            a(href = "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/data_all.csv", target="_blank", "CSV."),
-                                            "A",
-                                            a(href = "https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/codebook.csv", target="_blank", "Variable codebook"),
-                                            "is also available.",
-                                            "All data is available on our ",
-                                            a(href = "https://github.com/dsbbfinddx/data/tree/master/processed", target="_blank", "GitHub Repository.")
-                                          ),
-
-                                          p(class = "small", paste0("The data was last updated on: ",
-                                                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
-                                                                    ))
-
-
-                                   )
-                                 )
+                                 # fluidRow(
+                                 #   column(width = 12,
+                                 #          br(),
+                                 #          h3("Download the data"),
+                                 #          p("The selected data can be downloaded from", downloadLink("lnk_download_selected", label = "here.")),
+                                 #          p("All data is available through stable links as ",
+                                 #            a(href = "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/data_all.csv", target="_blank", "CSV."),
+                                 #            "A",
+                                 #            a(href = "https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/codebook.csv", target="_blank", "Variable codebook"),
+                                 #            "is also available.",
+                                 #            "All data is available on our ",
+                                 #            a(href = "https://github.com/dsbbfinddx/data/tree/master/processed", target="_blank", "GitHub Repository.")
+                                 #          ),
+                                 # 
+                                 #          p(class = "small", paste0("The data was last updated on: ",
+                                 #                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
+                                 #                                    ))
+                                 # 
+                                 # 
+                                 #   )
+                                 # )
                         )
                )
       )
