@@ -251,8 +251,8 @@ tablerDashPage(
                                           br(),
                                           h3("Download the data"),
                                           p("The selected data can be downloaded from", downloadLink("lnk_download_selected", label = "here.")),
-                                          p(class = "small", paste0("The data was last updated on: ",
-                                                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
+                                          p(class = "small", paste0("The data were last updated on: ",
+                                                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e%b%Y")
                                                                     ))
 
 
