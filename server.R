@@ -142,11 +142,11 @@ function(input, output, session) {
       },
       
       if (length(antigen_testing) > 0) {
-        colGroup(name = "Antigen rapid tests", columns = antigen_testing,
+        colGroup(name = "Antigen RDTs", columns = antigen_testing,
                  headerStyle = if (gray_column_groups[3]) list(`background-color` = "#f7f7f7"))
       },
       if (length(antibody_testing) > 0) {
-        colGroup(name = "Antibody rapid tests", columns = antibody_testing,
+        colGroup(name = "Antibody RDTs", columns = antibody_testing,
                  headerStyle = if (gray_column_groups[4]) list(`background-color` = "#f7f7f7"))
       }
     )
@@ -209,9 +209,9 @@ function(input, output, session) {
     if (input$slt_category == "Molecular Test") {
       value <- "Molecular test registered in country"
     } else if (input$slt_category == "Antigen RDT") {
-      value <- "Antigen rapid tests registered in country"
+      value <- "Antigen RDTs registered in country"
     } else if (input$slt_category == "Antibody RDT") {
-      value <- "Antibody rapid tests registered in country"
+      value <- "Antibody RDTs registered in country"
     }
     
     theme <- "grey"
@@ -292,7 +292,7 @@ function(input, output, session) {
 
     selected_test_cols <- switch (input$slt_category,
       `Molecular Test` = column_choices$`Molecular testing`,
-      `Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen rapid tests"),
+      `Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen RDTs"),
       `Antibody RDT` = column_choices$`Antibody testing`
     )
     

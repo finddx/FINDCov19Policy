@@ -79,21 +79,21 @@ setnames(dx_policy,
            "COVID-19 testing strategy available",
            "Molecular test registered in country",
            "Molecular test used to confirm COVID-19 diagnosis",
-           "Antigen rapid tests registered in country",
-           "Antigen rapid tests used to confirm COVID-19 diagnosis",
-           "Antigen rapid tests used for testing symptomatic patients",
-           "Antigen rapid tests used for testing asymptomatic patients",
+           "Antigen RDTs registered in country",
+           "Antigen RDTs used to confirm COVID-19 diagnosis",
+           "Antigen RDTs used for testing symptomatic patients",
+           "Antigen RDTs used for testing asymptomatic patients",
 
-           "Antigen rapid tests used for contact tracing",
-           "Antigen rapid tests used for healthcare workers",
-           "Antigen rapid tests used at borders",
-           "Antigen rapid tests used at schools/workplaces",
-           "Antigen rapid tests used for non COVID-19 hospitalized patients",
-           "Any limitations on who can use antigen rapid tests",
+           "Antigen RDTs used for contact tracing",
+           "Antigen RDTs used for healthcare workers",
+           "Antigen RDTs used at borders",
+           "Antigen RDTs used at schools/workplaces",
+           "Antigen RDTs used for non COVID-19 hospitalized patients",
+           "Any limitations on who can use antigen RDTs",
 
-           "Antibody rapid tests registered in country",
-           "Antibody rapid tests used to confirm COVID-19 diagnosis",
-           "Antibody rapid tests used for serosurveillance studies of COVID-19"
+           "Antibody RDTs registered in country",
+           "Antibody RDTs used to confirm COVID-19 diagnosis",
+           "Antibody RDTs used for serosurveillance studies of COVID-19"
          ))
 
 # Remove extra whitespace from policy links
@@ -173,31 +173,31 @@ default_cols <- c("Country",
                   "COVID-19 testing strategy available",
                   "Molecular test registered in country",
                   "Molecular test used to confirm COVID-19 diagnosis",
-                  "Antibody rapid tests registered in country",
-                  "Antibody rapid tests used to confirm COVID-19 diagnosis",
-                  "Antibody rapid tests used for serosurveillance studies of COVID-19",
-                  "Antigen rapid tests registered in country",
-                  "Antigen rapid tests used to confirm COVID-19 diagnosis",
-                  "Antigen rapid tests used for testing symptomatic patients")
+                  "Antibody RDTs registered in country",
+                  "Antibody RDTs used to confirm COVID-19 diagnosis",
+                  "Antibody RDTs used for serosurveillance studies of COVID-19",
+                  "Antigen RDTs registered in country",
+                  "Antigen RDTs used to confirm COVID-19 diagnosis",
+                  "Antigen RDTs used for testing symptomatic patients")
 
 testing_cols <- c("COVID-19 testing strategy available",
 
                   "Molecular test registered in country",
                   "Molecular test used to confirm COVID-19 diagnosis",
 
-                  "Antigen rapid tests registered in country",
-                  "Antigen rapid tests used to confirm COVID-19 diagnosis",
-                  "Antigen rapid tests used for testing symptomatic patients",
-                  "Antigen rapid tests used for testing asymptomatic patients",
-                  "Antigen rapid tests used for contact tracing",
-                  "Antigen rapid tests used for healthcare workers",
-                  "Antigen rapid tests used at borders",
-                  "Antigen rapid tests used at schools/workplaces",
-                  "Antigen rapid tests used for non COVID-19 hospitalized patients",
+                  "Antigen RDTs registered in country",
+                  "Antigen RDTs used to confirm COVID-19 diagnosis",
+                  "Antigen RDTs used for testing symptomatic patients",
+                  "Antigen RDTs used for testing asymptomatic patients",
+                  "Antigen RDTs used for contact tracing",
+                  "Antigen RDTs used for healthcare workers",
+                  "Antigen RDTs used at borders",
+                  "Antigen RDTs used at schools/workplaces",
+                  "Antigen RDTs used for non COVID-19 hospitalized patients",
 
-                  "Antibody rapid tests registered in country",
-                  "Antibody rapid tests used to confirm COVID-19 diagnosis",
-                  "Antibody rapid tests used for serosurveillance studies of COVID-19"
+                  "Antibody RDTs registered in country",
+                  "Antibody RDTs used to confirm COVID-19 diagnosis",
+                  "Antibody RDTs used for serosurveillance studies of COVID-19"
 )
 
 column_choices <- list(
@@ -214,21 +214,21 @@ column_choices <- list(
     "Molecular test used to confirm COVID-19 diagnosis"
   ),
   `Antibody testing` = c(
-    "Antibody rapid tests registered in country",
-    "Antibody rapid tests used to confirm COVID-19 diagnosis",
-    "Antibody rapid tests used for serosurveillance studies of COVID-19"
+    "Antibody RDTs registered in country",
+    "Antibody RDTs used to confirm COVID-19 diagnosis",
+    "Antibody RDTs used for serosurveillance studies of COVID-19"
   ),
   `Antigen testing` = c(
-    "Antigen rapid tests registered in country",
-    "Antigen rapid tests used to confirm COVID-19 diagnosis",
-    "Antigen rapid tests used for testing symptomatic patients",
-    "Antigen rapid tests used for testing asymptomatic patients",
-    "Antigen rapid tests used for contact tracing",
-    "Antigen rapid tests used for healthcare workers",
-    "Antigen rapid tests used at borders",
-    "Antigen rapid tests used at schools/workplaces",
-    "Antigen rapid tests used for non COVID-19 hospitalized patients",
-    "Any limitations on who can use antigen rapid tests"
+    "Antigen RDTs registered in country",
+    "Antigen RDTs used to confirm COVID-19 diagnosis",
+    "Antigen RDTs used for testing symptomatic patients",
+    "Antigen RDTs used for testing asymptomatic patients",
+    "Antigen RDTs used for contact tracing",
+    "Antigen RDTs used for healthcare workers",
+    "Antigen RDTs used at borders",
+    "Antigen RDTs used at schools/workplaces",
+    "Antigen RDTs used for non COVID-19 hospitalized patients",
+    "Any limitations on who can use antigen RDTs"
   )
 )
 
