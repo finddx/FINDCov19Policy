@@ -65,19 +65,6 @@ tablerDashPage(
         .hvr-underline-from-left:hover:before, .hvr-underline-from-left:focus:before, .hvr-underline-from-left:active:before {
           right: 0;
         }
-        
-        #rb_group .shiny-options-group {
-          height: auto;
-          width: 250px;
-          -webkit-column-count: 2;
-          -moz-column-count: 2;
-          column-count: 2;
-          -webkit-column-fill: balance;
-          -moz-column-fill: balance;
-          column-fill: balance;
-          margin-top: 0px;
-          margin-right: 100px;
-        }
       "),
 
       tags$script(HTML("
@@ -215,16 +202,17 @@ tablerDashPage(
                                                   inputId = "rb_group",
                                                   label = NULL,
                                                   status = "default",
-                                                  inline = TRUE,
+                                                  inline = FALSE,
                                                   choices = c(
-                                                    "by continent, or" = "Continent",
-                                                    "by country details" = "Country",
-                                                    "by income group aggregation" = "Income"
+                                                    "by continent aggregation" = "Continent",
+                                                    "by income group aggregation" = "Income",
+                                                    "by country details" = "Country"
                                                   )
                                                 ),
                                                 tags$span(
-                                                  class="info-mark",
+                                                  class = "info-mark",
                                                   icon("info-circle"),
+                                                  style = "margin-left: -70px; margin-top: -3px;",
                                                   tags$div(
                                                     class = "info-mark-text",
                                                     tags$p('Please select to display the table by country, continent or income classification')
