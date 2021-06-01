@@ -42,7 +42,7 @@ function(input, output, session) {
     # Select only cols to show
     df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", input$rb_group), with = FALSE]
     
-    policy_testing <- colnames(df)[colnames(df) == "Covid-19 testing strategy available"]
+    policy_testing <- colnames(df)[colnames(df) == "COVID-19 testing strategy available"]
     molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
     antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Antigen testing`]
     antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody testing`]
@@ -185,7 +185,7 @@ function(input, output, session) {
     )
     
     if (input$rb_group == "Country") {
-      range_filter_cols <- c("Continent", "Income", "Covid-19 testing strategy available", testing_cols)
+      range_filter_cols <- c("Continent", "Income", "COVID-19 testing strategy available", testing_cols)
       
       #filter_cols <- which(colnames(df) %in% testing_cols)
       columns_name <- sapply(out$x$tag$attribs$columns, `[[`, "name")

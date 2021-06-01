@@ -51,16 +51,16 @@ dx_policy[, `Notes` := NULL]
 names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
 
 # Covid case sensitivity
-names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("covid-19", ignore_case = TRUE), replacement = "Covid-19")
+names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("covid-19", ignore_case = TRUE), replacement = "COVID-19")
 
 # Simplify questions
 setnames(dx_policy,
          old = c(
-           "Does the country have a policy that guides Covid-19 testing strategy?",
+           "Does the country have a policy that guides COVID-19 testing strategy?",
            "Is molecular testing registered for use in country?",
-           "Is molecular testing used to confirm a Covid-19 diagnosis?",
+           "Is molecular testing used to confirm a COVID-19 diagnosis?",
            "Are antigen rapid tests registered for use in country?",
-           "Are antigen rapid tests used to confirm Covid-19 diagnosis?",
+           "Are antigen rapid tests used to confirm COVID-19 diagnosis?",
            "Are antigen rapid tests used for the testing of symptomatic patients?",
            "Are antigen rapid tests used for the screening of asymptomatic patients?",
 
@@ -68,19 +68,19 @@ setnames(dx_policy,
            "Are antigen rapid tests used for testing of health care workers / front line staff?",
            "Are antigen rapid tests used for testing at borders / points of entry?",
            "Are antigen rapid tests used for testing at schools / workplaces?",
-           "Are antigen rapid tests used for testing for non Covid-19 hospitalized patients (e.g., scheduled or elective surgery)?",
+           "Are antigen rapid tests used for testing for non COVID-19 hospitalized patients (e.g., scheduled or elective surgery)?",
            "Who is allowed to use the Ag-RDTs (only health workers etc)?",
 
            "Are antibody rapid tests registered for use in country?",
-           "Are antibody rapid tests used to confirm a Covid-19 diagnosis?",
-           "Are antibody rapid tests used for serosurveillance studies of Covid-19?"
+           "Are antibody rapid tests used to confirm a COVID-19 diagnosis?",
+           "Are antibody rapid tests used for serosurveillance studies of COVID-19?"
          ),
          new = c(
-           "Covid-19 testing strategy available",
+           "COVID-19 testing strategy available",
            "Molecular test registered in country",
-           "Molecular test used to confirm covid-19 diagnosis",
+           "Molecular test used to confirm COVID-19 diagnosis",
            "Antigen rapid tests registered in country",
-           "Antigen rapid tests used to confirm covid-19 diagnosis",
+           "Antigen rapid tests used to confirm COVID-19 diagnosis",
            "Antigen rapid tests used for testing symptomatic patients",
            "Antigen rapid tests used for testing asymptomatic patients",
 
@@ -88,12 +88,12 @@ setnames(dx_policy,
            "Antigen rapid tests used for health care workers",
            "Antigen rapid tests used at borders",
            "Antigen rapid tests used at schools/workplaces",
-           "Antigen rapid tests used for non covid-19 hospitalized patients",
+           "Antigen rapid tests used for non COVID-19 hospitalized patients",
            "Any limitations on who can use antigen rapid tests",
 
            "Antibody rapid tests registered in country",
-           "Antibody rapid tests used to confirm covid-19 diagnosis",
-           "Antibody rapid tests used for serosurveillance studies of covid-19"
+           "Antibody rapid tests used to confirm COVID-19 diagnosis",
+           "Antibody rapid tests used for serosurveillance studies of COVID-19"
          ))
 
 # Remove extra whitespace from policy links
@@ -168,34 +168,34 @@ public_cols <- setdiff(colnames(dx_policy), c("Flag"))
 default_cols <- c("Country",
                   "Continent",
                   "Income",
-                  "Covid-19 testing strategy available",
+                  "COVID-19 testing strategy available",
                   "Molecular test registered in country",
-                  "Molecular test used to confirm covid-19 diagnosis",
+                  "Molecular test used to confirm COVID-19 diagnosis",
                   "Antibody rapid tests registered in country",
-                  "Antibody rapid tests used to confirm covid-19 diagnosis",
-                  "Antibody rapid tests used for serosurveillance studies of covid-19",
+                  "Antibody rapid tests used to confirm COVID-19 diagnosis",
+                  "Antibody rapid tests used for serosurveillance studies of COVID-19",
                   "Antigen rapid tests registered in country",
-                  "Antigen rapid tests used to confirm covid-19 diagnosis",
+                  "Antigen rapid tests used to confirm COVID-19 diagnosis",
                   "Antigen rapid tests used for testing symptomatic patients")
 
-testing_cols <- c("Covid-19 testing strategy available",
+testing_cols <- c("COVID-19 testing strategy available",
 
                   "Molecular test registered in country",
-                  "Molecular test used to confirm covid-19 diagnosis",
+                  "Molecular test used to confirm COVID-19 diagnosis",
 
                   "Antigen rapid tests registered in country",
-                  "Antigen rapid tests used to confirm covid-19 diagnosis",
+                  "Antigen rapid tests used to confirm COVID-19 diagnosis",
                   "Antigen rapid tests used for testing symptomatic patients",
                   "Antigen rapid tests used for testing asymptomatic patients",
                   "Antigen rapid tests used for contact tracing",
                   "Antigen rapid tests used for health care workers",
                   "Antigen rapid tests used at borders",
                   "Antigen rapid tests used at schools/workplaces",
-                  "Antigen rapid tests used for non covid-19 hospitalized patients",
+                  "Antigen rapid tests used for non COVID-19 hospitalized patients",
 
                   "Antibody rapid tests registered in country",
-                  "Antibody rapid tests used to confirm covid-19 diagnosis",
-                  "Antibody rapid tests used for serosurveillance studies of covid-19"
+                  "Antibody rapid tests used to confirm COVID-19 diagnosis",
+                  "Antibody rapid tests used for serosurveillance studies of COVID-19"
 )
 
 column_choices <- list(
@@ -204,28 +204,28 @@ column_choices <- list(
     "Continent",
     "Income",
     "Date of last update",
-    "Covid-19 testing strategy available",
+    "COVID-19 testing strategy available",
     "Policy Links"
   ),
   `Molecular testing` = c(
     "Molecular test registered in country",
-    "Molecular test used to confirm covid-19 diagnosis"
+    "Molecular test used to confirm COVID-19 diagnosis"
   ),
   `Antibody testing` = c(
     "Antibody rapid tests registered in country",
-    "Antibody rapid tests used to confirm covid-19 diagnosis",
-    "Antibody rapid tests used for serosurveillance studies of covid-19"
+    "Antibody rapid tests used to confirm COVID-19 diagnosis",
+    "Antibody rapid tests used for serosurveillance studies of COVID-19"
   ),
   `Antigen testing` = c(
     "Antigen rapid tests registered in country",
-    "Antigen rapid tests used to confirm covid-19 diagnosis",
+    "Antigen rapid tests used to confirm COVID-19 diagnosis",
     "Antigen rapid tests used for testing symptomatic patients",
     "Antigen rapid tests used for testing asymptomatic patients",
     "Antigen rapid tests used for contact tracing",
     "Antigen rapid tests used for health care workers",
     "Antigen rapid tests used at borders",
     "Antigen rapid tests used at schools/workplaces",
-    "Antigen rapid tests used for non covid-19 hospitalized patients",
+    "Antigen rapid tests used for non COVID-19 hospitalized patients",
     "Any limitations on who can use antigen rapid tests"
   )
 )
@@ -239,7 +239,7 @@ dx_policy[, (testing_cols) := lapply(.SD, function(x) {
 }), .SDcols = testing_cols]
 
 setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update",
-                         "Covid-19 testing strategy available",
+                         "COVID-19 testing strategy available",
                          column_choices$`Molecular testing`,
                          column_choices$`Antigen testing`,
                          column_choices$`Antibody testing`
