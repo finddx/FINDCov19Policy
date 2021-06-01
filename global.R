@@ -107,11 +107,13 @@ dx_policy[, (policy_links_cols) := lapply(.SD, function(x) ifelse(is_valid_url(x
 dx_policy[, (policy_links_cols) := lapply(.SD, get_url), .SDcols = policy_links_cols]
 
 # Turn policy links into links ------------------
+setnames(dx_policy, "Policy Links", "Policy links")
+
 ## Use <br> for linebreaks
-# dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "<br>NA")]
-#dx_policy[, `Policy Links` := str_remove_all(`Policy Links`, pattern = "\\n")]
-dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(\\r)*\\n", replacement = "<br>")]
-dx_policy[, `Policy Links` := str_replace_all(`Policy Links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
+# dx_policy[, `Policy links` := str_remove_all(`Policy links`, pattern = "<br>NA")]
+#dx_policy[, `Policy links` := str_remove_all(`Policy links`, pattern = "\\n")]
+dx_policy[, `Policy links` := str_replace_all(`Policy links`, pattern = "(\\r)*\\n", replacement = "<br>")]
+dx_policy[, `Policy links` := str_replace_all(`Policy links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
 
 # Merge continent -------------------------------
 codelist <- setNames(countrycode::codelist[, c("iso2c", "iso3c", "continent", "iso.name.en")], c("iso2c", "iso3c", "Continent", "iso.name.en"))
@@ -205,7 +207,7 @@ column_choices <- list(
     "Income",
     "Date of last update",
     "COVID-19 testing strategy available",
-    "Policy Links"
+    "Policy links"
   ),
   `Molecular testing` = c(
     "Molecular test registered in country",
@@ -246,7 +248,7 @@ setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last
 ))
 
 # Convert columns to factor/date ----------------
-factor_cols <- public_cols[!public_cols %in% c("Policy Links", "Date of last update")]
+factor_cols <- public_cols[!public_cols %in% c("Policy links", "Date of last update")]
 dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
 dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 

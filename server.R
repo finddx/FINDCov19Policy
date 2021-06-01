@@ -62,7 +62,7 @@ function(input, output, session) {
                     return elem;
                   }
                 ")),
-        `Policy Links` = colDef(html = TRUE, minWidth = 1000)
+        `Policy links` = colDef(html = TRUE, minWidth = 1000)
       )
       columns_list <- c(
         columns_list,
@@ -346,7 +346,7 @@ function(input, output, session) {
             list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
           } 
           
-          //var links = (params.data['Policy Links']);
+          //var links = (params.data['Policy links']);
           
           //'</h4>' + '%s' + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + 
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
