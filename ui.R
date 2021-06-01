@@ -246,27 +246,18 @@ tablerDashPage(
                                    )
                                  ),
 
-                                 # fluidRow(
-                                 #   column(width = 12,
-                                 #          br(),
-                                 #          h3("Download the data"),
-                                 #          p("The selected data can be downloaded from", downloadLink("lnk_download_selected", label = "here.")),
-                                 #          p("All data is available through stable links as ",
-                                 #            a(href = "https://raw.githubusercontent.com/dsbbfinddx/FINDCov19TrackerData/master/processed/data_all.csv", target="_blank", "CSV."),
-                                 #            "A",
-                                 #            a(href = "https://github.com/dsbbfinddx/FINDCov19TrackerData/blob/master/processed/codebook.csv", target="_blank", "Variable codebook"),
-                                 #            "is also available.",
-                                 #            "All data is available on our ",
-                                 #            a(href = "https://github.com/dsbbfinddx/data/tree/master/processed", target="_blank", "GitHub Repository.")
-                                 #          ),
-                                 # 
-                                 #          p(class = "small", paste0("The data was last updated on: ",
-                                 #                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
-                                 #                                    ))
-                                 # 
-                                 # 
-                                 #   )
-                                 # )
+                                 fluidRow(
+                                   column(width = 12,
+                                          br(),
+                                          h3("Download the data"),
+                                          p("The selected data can be downloaded from", downloadLink("lnk_download_selected", label = "here.")),
+                                          p(class = "small", paste0("The data was last updated on: ",
+                                                                    format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e-%b-%Y")
+                                                                    ))
+
+
+                                   )
+                                 )
                         )
                )
       )
