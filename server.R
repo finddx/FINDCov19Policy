@@ -379,12 +379,18 @@ function(input, output, session) {
       
       if (input$rb_group == "Country") {
         # Country
-        df <- df[selected(), colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+        df <- df[, colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+        if (length(selected() > 0L)) {
+          df <- df[selected()]
+        }
         
         fwrite(x = df, file = file)
       } else {
         # Continent / Income group
-        categories <- as.character(na.omit(unique(df[[input$rb_group]])))[selected()]
+        categories <- as.character(na.omit(unique(df[[input$rb_group]])))
+        if (length(selected() > 0L)) {
+          categories <- categories[selected()]
+        }
         testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
         
         # Convert values
