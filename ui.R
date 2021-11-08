@@ -144,7 +144,7 @@ tablerDashPage(
                                                    prettyRadioButtons(
                                                      inputId = "slt_category",
                                                      label = NULL,
-                                                     choices = c("Molecular Test", "Antigen RDT", "Antibody RDT"),
+                                                     choices = c("Molecular Test", "Antigen RDT", "Antibody RDT", "Self Test"),
                                                      status = "default",
                                                      inline = TRUE
                                                    ),

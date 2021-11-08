@@ -46,8 +46,9 @@ function(input, output, session) {
     molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
     antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Antigen testing`]
     antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody testing`]
+    self_testing <- colnames(df)[colnames(df) %in% column_choices$`Self testing`]
     
-    testing_cols_list <- list(policy_testing, molecular_testing, antigen_testing, antibody_testing)
+    testing_cols_list <- list(policy_testing, molecular_testing, antigen_testing, antibody_testing, self_testing)
     gray_columns <- unlist(testing_cols_list[as.logical(cumsum(
       unlist(lapply(testing_cols_list, length)) > 0
     ) %% 2)])
@@ -129,8 +130,9 @@ function(input, output, session) {
     
     # Column group list
     gray_column_groups <- cumsum(
-      unlist(lapply(list(policy_testing, molecular_testing, antigen_testing, antibody_testing), length)) > 0
+      unlist(lapply(list(policy_testing, molecular_testing, antigen_testing, antibody_testing, self_testing), length)) > 0
     ) %% 2
+    
     columnGroups_list <- list(
       if (length(policy_testing) > 0) {
         colGroup(name = "Testing policy", columns = policy_testing, 
@@ -140,7 +142,6 @@ function(input, output, session) {
         colGroup(name = "Molecular testing", columns = molecular_testing,
                  headerStyle = if (gray_column_groups[2]) list(`background-color` = "#f7f7f7"))
       },
-      
       if (length(antigen_testing) > 0) {
         colGroup(name = "Antigen RDTs", columns = antigen_testing,
                  headerStyle = if (gray_column_groups[3]) list(`background-color` = "#f7f7f7"))
@@ -148,6 +149,10 @@ function(input, output, session) {
       if (length(antibody_testing) > 0) {
         colGroup(name = "Antibody RDTs", columns = antibody_testing,
                  headerStyle = if (gray_column_groups[4]) list(`background-color` = "#f7f7f7"))
+      },
+      if (length(self_testing) > 0) {
+        colGroup(name = "Self testing", columns = self_testing,
+                 headerStyle = if (gray_column_groups[5]) list(`background-color` = "#f7f7f7"))
       }
     )
 
@@ -212,6 +217,8 @@ function(input, output, session) {
       value <- "Antigen RDTs registered in country"
     } else if (input$slt_category == "Antibody RDT") {
       value <- "Antibody RDTs registered in country"
+    } else if (input$slt_category == "Self Test") {
+      value <- "Self tests registered for use in country?"
     }
     
     theme <- "grey"
@@ -293,7 +300,8 @@ function(input, output, session) {
     selected_test_cols <- switch (input$slt_category,
       `Molecular Test` = column_choices$`Molecular testing`,
       `Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen RDTs"),
-      `Antibody RDT` = column_choices$`Antibody testing`
+      `Antibody RDT` = column_choices$`Antibody testing`,
+      `Self Test` = column_choices$`Self testing`
     )
     
     df %>%

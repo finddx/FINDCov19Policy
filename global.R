@@ -42,7 +42,7 @@ wb_classification[, Income := `Income group`]
 wb_classification[, `Income group` := NULL]
 
 # Read dx policy --------------------------------
-dx_policy <- readxl::read_xlsx("data/Policy_Mapping.xlsx")
+dx_policy <- readxl::read_xlsx("data/Policy_Mapping_v2.xlsx")
 setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
 dx_policy[, `Notes` := NULL]
@@ -52,6 +52,9 @@ names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacemen
 
 # Covid case sensitivity
 names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("covid-19", ignore_case = TRUE), replacement = "COVID-19")
+
+# Rename self-test questions
+names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("Are self[- ]tests?", ignore_case = TRUE), replacement = "Self tests")
 
 # Simplify questions
 setnames(dx_policy,
@@ -73,7 +76,9 @@ setnames(dx_policy,
 
            "Are antibody rapid tests registered for use in country?",
            "Are antibody rapid tests used to confirm a COVID-19 diagnosis?",
-           "Are antibody rapid tests used for serosurveillance studies of COVID-19?"
+           "Are antibody rapid tests used for serosurveillance studies of COVID-19?",
+           
+           "Self tests used in the screening of contacts of know COVID-19 cases?"
          ),
          new = c(
            "COVID-19 testing strategy available",
@@ -93,7 +98,9 @@ setnames(dx_policy,
 
            "Antibody RDTs registered in country",
            "Antibody RDTs used to confirm COVID-19 diagnosis",
-           "Antibody RDTs used for serosurveillance studies of COVID-19"
+           "Antibody RDTs used for serosurveillance studies of COVID-19",
+           
+           "Self tests used in the screening of contacts of known COVID-19 cases?"
          ))
 
 # Remove extra whitespace from policy links
@@ -178,7 +185,11 @@ default_cols <- c("Country",
                   "Antibody RDTs used for serosurveillance studies of COVID-19",
                   "Antigen RDTs registered in country",
                   "Antigen RDTs used to confirm COVID-19 diagnosis",
-                  "Antigen RDTs used for testing symptomatic patients")
+                  "Antigen RDTs used for testing symptomatic patients",
+                  
+                  "Is self-testing for COVID-19 allowed in the country?",
+                  "Self tests registered for use in country?",
+                  "Self tests used in the screening of symptomatic patients?")
 
 testing_cols <- c("COVID-19 testing strategy available",
 
@@ -197,7 +208,18 @@ testing_cols <- c("COVID-19 testing strategy available",
 
                   "Antibody RDTs registered in country",
                   "Antibody RDTs used to confirm COVID-19 diagnosis",
-                  "Antibody RDTs used for serosurveillance studies of COVID-19"
+                  "Antibody RDTs used for serosurveillance studies of COVID-19",
+                  
+                  "Is self-testing for COVID-19 allowed in the country?",
+                  "Self tests registered for use in country?",
+                  "Self tests used in the screening of symptomatic patients?",
+                  "Self tests used in the screening of contacts of known COVID-19 cases?",
+                  "Self tests used in the screening of HCWs / front-line staff?",
+                  "Self tests used in the screening of asymptomatic populations?",
+                  "Self tests used at schools?",      
+                  "Self tests used at workplaces?",
+                  "Self tests used at borders/travel?",
+                  "Self tests used at Outpatient Departments (OPDs)?"
 )
 
 column_choices <- list(
@@ -229,6 +251,18 @@ column_choices <- list(
     "Antigen RDTs used at schools/workplaces",
     "Antigen RDTs used for non COVID-19 hospitalized patients",
     "Any limitations on who can use antigen RDTs"
+  ),
+  `Self testing` = c(
+    "Is self-testing for COVID-19 allowed in the country?",
+    "Self tests registered for use in country?",
+    "Self tests used in the screening of symptomatic patients?",
+    "Self tests used in the screening of contacts of known COVID-19 cases?",
+    "Self tests used in the screening of HCWs / front-line staff?",
+    "Self tests used in the screening of asymptomatic populations?",
+    "Self tests used at schools?",      
+    "Self tests used at workplaces?",
+    "Self tests used at borders/travel?",
+    "Self tests used at Outpatient Departments (OPDs)?"
   )
 )
 
@@ -244,7 +278,8 @@ setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last
                          "COVID-19 testing strategy available",
                          column_choices$`Molecular testing`,
                          column_choices$`Antigen testing`,
-                         column_choices$`Antibody testing`
+                         column_choices$`Antibody testing`,
+                         column_choices$`Self testing`
 ))
 
 # Convert columns to factor/date ----------------
