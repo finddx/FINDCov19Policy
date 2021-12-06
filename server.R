@@ -218,7 +218,7 @@ function(input, output, session) {
     } else if (input$slt_category == "Antibody RDT") {
       value <- "Antibody RDTs registered in country"
     } else if (input$slt_category == "Self Test") {
-      value <- "Self tests registered for use in country?"
+      value <- "Self tests registered for use in country"
     }
     
     theme <- "grey"
