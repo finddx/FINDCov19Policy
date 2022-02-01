@@ -112,7 +112,7 @@ setnames(dx_policy,
            
            # Self Tests
            "Self tests used in the screening of contacts of confirmed or suspected cases",
-           "Is self-testing for COVID-19 allowed in the country",
+           "Does the country have a policy guiding COVID-19 self-testing",
            "Self tests registered for use in country",
            "Self tests used in the screening of symptomatic cases",
            "Self tests used in the screening of HCWs",
@@ -207,7 +207,7 @@ default_cols <- c("Country",
                   "Antigen RDTs used to confirm COVID-19 diagnosis",
                   "Antigen RDTs used for testing symptomatic cases",
                   
-                  "Is self-testing for COVID-19 allowed in the country",
+                  "Does the country have a policy guiding COVID-19 self-testing",
                   "Self tests registered for use in country",
                   "Self tests used in the screening of symptomatic cases")
 
@@ -230,7 +230,7 @@ testing_cols <- c("COVID-19 testing strategy available",
                   "Antibody RDTs used to confirm COVID-19 diagnosis",
                   "Antibody RDTs used for serosurveillance studies of COVID-19",
                   
-                  "Is self-testing for COVID-19 allowed in the country",
+                  "Does the country have a policy guiding COVID-19 self-testing",
                   "Self tests registered for use in country",
                   "Self tests used in the screening of symptomatic cases",
                   "Self tests used in the screening of contacts of confirmed or suspected cases",
@@ -272,7 +272,7 @@ column_choices <- list(
     "Who can be tested with Antigen RDTs"
   ),
   `Self testing` = c(
-    "Is self-testing for COVID-19 allowed in the country",
+    "Does the country have a policy guiding COVID-19 self-testing",
     "Self tests registered for use in country",
     "Self tests used in the screening of symptomatic cases",
     "Self tests used in the screening of contacts of confirmed or suspected cases",
