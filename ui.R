@@ -23,7 +23,8 @@ tablerDashPage(
                         tags$div(class="card-body",
                                  section_about(),
                                  mod_map_ui(id = "mod_map"),
-                                 mod_policy_table_ui(id = "mod_table")
+                                 mod_policy_table_ui(id = "mod_table"),
+                                 section_contact()
                         )
                )
       )
