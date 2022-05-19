@@ -249,6 +249,7 @@ mod_map_server <- function(input, output, session) {
       
       # Filter based on ISO
       df <- df_full[iso2c == rv$selected_on_map, ]
+      df <- df[1, ]
       
       selected_test_cols <- switch (input$slt_category,
                                     `Molecular Test` = column_choices$`Molecular testing`,
