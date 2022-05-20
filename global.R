@@ -39,7 +39,8 @@ wb_classification[, Income := `Income group`]
 wb_classification[, `Income group` := NULL]
 
 # Read dx policy --------------------------------
-dx_policy <- readxl::read_xlsx("data/Policy_Mapping_v2.xlsx")
+policy_file_path <- "data/Policy_Mapping_v2.xlsx"
+dx_policy <- readxl::read_xlsx(policy_file_path)
 setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
 dx_policy[, `Notes` := NULL]
