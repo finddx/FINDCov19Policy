@@ -7,7 +7,7 @@ mod_policy_table_ui <- function(id) {
           
           p("The table below displays diagnostics policy data:"),
           
-          tags$div(class = "info-container",
+          tags$div(class = "info-container", style = "display: flex; align-items: flex-end;",
                    pickerInput(
                      inputId = ns("cb_selected_cols"),
                      label = "Select columns to show",
@@ -19,10 +19,8 @@ mod_policy_table_ui <- function(id) {
                      ),
                      choices = column_choices,
                      selected = default_cols
-                   )
-          ),
-          tags$div(class = "info-container",
-                   prettyCheckbox(ns("cb_show_data"), "Show only countries with data", value = TRUE)
+                   ),
+                   tags$div(prettyCheckbox(ns("cb_show_data"), "Show only countries with data", value = TRUE), style = "margin-left: 20px;")
           ),
           reactable::reactableOutput(ns("tbl_country_list"))
       )
