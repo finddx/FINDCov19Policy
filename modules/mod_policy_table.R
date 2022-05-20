@@ -70,9 +70,9 @@ mod_policy_table_server <- function(input, output, session) {
     df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", "Continent", "Income"), with = FALSE]
     
     policy_testing <- colnames(df)[colnames(df) == "COVID-19 testing strategy available"]
-    molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
+    molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular Test`]
     antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Professional Use Antigen RDT`]
-    antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody testing`]
+    antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody RDT`]
     self_testing <- colnames(df)[colnames(df) %in% column_choices$`Self-test Antigen RDT`]
     
     testing_cols_list <- list(policy_testing, molecular_testing, antigen_testing, antibody_testing, self_testing)
@@ -116,7 +116,7 @@ mod_policy_table_server <- function(input, output, session) {
                  headerStyle = if (gray_column_groups[1]) list(`background-color` = "#f7f7f7"))
       },
       if (length(molecular_testing) > 0) {
-        colGroup(name = "Molecular testing", columns = molecular_testing,
+        colGroup(name = "Molecular Test", columns = molecular_testing,
                  headerStyle = if (gray_column_groups[2]) list(`background-color` = "#f7f7f7"))
       },
       if (length(antibody_testing) > 0) {

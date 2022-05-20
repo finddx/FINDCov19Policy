@@ -248,11 +248,11 @@ column_choices <- list(
     "COVID-19 testing strategy available",
     "Policy links"
   ),
-  `Molecular testing` = c(
+  `Molecular Test` = c(
     "Molecular test registered in country",
     "Molecular test used to confirm COVID-19 diagnosis"
   ),
-  `Antibody testing` = c(
+  `Antibody RDT` = c(
     "Antibody RDTs registered in country",
     "Antibody RDTs used to confirm COVID-19 diagnosis",
     "Antibody RDTs used for serosurveillance studies of COVID-19"
@@ -300,9 +300,9 @@ dx_policy[, (testing_cols) := lapply(.SD, function(x) {
 
 setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update",
                          "COVID-19 testing strategy available",
-                         column_choices$`Molecular testing`,
+                         column_choices$`Molecular Test`,
                          column_choices$`Professional Use Antigen RDT`,
-                         column_choices$`Antibody testing`,
+                         column_choices$`Antibody RDT`,
                          column_choices$`Self-test Antigen RDT`
 ))
 
