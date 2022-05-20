@@ -23,16 +23,13 @@ library(urltools)
 #Sys.setlocale("LC_ALL","English")
 Sys.setlocale("LC_TIME", "C")
 
-material_dep <- htmltools::htmlDependency(
-  name = "material-ui",
-  version = "4.6.1",
-  src = c(href = "https://unpkg.com/@material-ui/core/umd/"),
-  script = "material-ui.production.min.js"
-)
-
 # Read helper functions
 helper_files <- dir("helpers", full.names = TRUE)
 lapply(helper_files, source)
+
+# Read modules
+module_files <- dir("modules", full.names = TRUE)
+lapply(module_files, source)
 
 # World Bank classification ---------------------
 wb_classification <- readxl::read_xls("data/WorldBank Classification.xls", skip = 4)
