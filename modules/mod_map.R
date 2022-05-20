@@ -175,13 +175,7 @@ mod_map_server <- function(input, output, session) {
     df[, value := ifelse(is.na(df$value), "No data", df$value)]
     df[, value := value_lookup[df$value]]
     
-    selected_test_cols <- switch (input$slt_category,
-                                  `Molecular Test` = column_choices$`Molecular testing`,
-                                  `Professional Use Antigen RDT` = setdiff(column_choices$`Professional Use Antigen RDT`, 
-                                                                           "Any limitations on who can use antigen RDTs"),
-                                  `Antibody RDT` = column_choices$`Antibody testing`,
-                                  `Self-test Antigen RDT` = column_choices$`Self-test Antigen RDT`
-    )
+    selected_test_cols <- input$slt_question
     
     df %>%
       e_charts(name, dispose = FALSE) %>% 
