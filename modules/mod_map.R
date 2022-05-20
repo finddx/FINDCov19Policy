@@ -13,7 +13,7 @@ mod_map_ui <- function(id) {
                       prettyRadioButtons(
                         inputId = ns("slt_category"),
                         label = NULL,
-                        choices = c("Molecular Test", "Antigen RDT", "Antibody RDT", "Self Test"),
+                        choices = c("Molecular Test", "Antibody RDT", "Professional Use Antigen RDT", "Self-test Antigen RDT"),
                         status = "default",
                         inline = TRUE
                       ),
@@ -72,11 +72,11 @@ mod_map_server <- function(input, output, session) {
     
     if (input$slt_category == "Molecular Test") {
       value <- "Molecular test registered in country"
-    } else if (input$slt_category == "Antigen RDT") {
+    } else if (input$slt_category == "Professional Use Antigen RDT") {
       value <- "Antigen RDTs registered in country"
     } else if (input$slt_category == "Antibody RDT") {
       value <- "Antibody RDTs registered in country"
-    } else if (input$slt_category == "Self Test") {
+    } else if (input$slt_category == "Self-test Antigen RDT") {
       value <- "Self tests registered for use in country"
     }
     
@@ -160,9 +160,9 @@ mod_map_server <- function(input, output, session) {
     
     selected_test_cols <- switch (input$slt_category,
                                   `Molecular Test` = column_choices$`Molecular testing`,
-                                  `Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen RDTs"),
+                                  `Professional Use Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen RDTs"),
                                   `Antibody RDT` = column_choices$`Antibody testing`,
-                                  `Self Test` = column_choices$`Self testing`
+                                  `Self-test Antigen RDT` = column_choices$`Self testing`
     )
     
     df %>%
@@ -253,9 +253,9 @@ mod_map_server <- function(input, output, session) {
       
       selected_test_cols <- switch (input$slt_category,
                                     `Molecular Test` = column_choices$`Molecular testing`,
-                                    `Antigen RDT` = column_choices$`Antigen testing`,
+                                    `Professional Use Antigen RDT` = column_choices$`Antigen testing`,
                                     `Antibody RDT` = column_choices$`Antibody testing`,
-                                    `Self Test` = column_choices$`Self testing`
+                                    `Self-test Antigen RDT` = column_choices$`Self testing`
       )
       
       test_list <- tags$ul(
