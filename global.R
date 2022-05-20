@@ -257,7 +257,7 @@ column_choices <- list(
     "Antibody RDTs used to confirm COVID-19 diagnosis",
     "Antibody RDTs used for serosurveillance studies of COVID-19"
   ),
-  `Antigen testing` = c(
+  `Professional Use Antigen RDT` = c(
     "Antigen RDTs registered in country",
     "Antigen RDTs used to confirm COVID-19 diagnosis",
     "Antigen RDTs used for testing symptomatic cases",
@@ -269,7 +269,7 @@ column_choices <- list(
     "Antigen RDTs used for non COVID-19 hospitalized patients",
     "Who can be tested with Antigen RDTs"
   ),
-  `Self testing` = c(
+  `Self-test Antigen RDT` = c(
     "Does the country have a policy guiding COVID-19 self-testing",
     "Self tests registered for use in country",
     "Self tests used in the screening of symptomatic cases",
@@ -283,6 +283,13 @@ column_choices <- list(
   )
 )
 
+registration_questions <- list(
+  `Molecular Test` = "Molecular test registered in country",
+  `Antibody RDT` = "Antibody RDTs registered in country",
+  `Professional Use Antigen RDT` = "Antigen RDTs registered in country",
+  `Self-test Antigen RDT` = "Self tests registered for use in country"
+)
+
 dx_policy[, (testing_cols) := lapply(.SD, function(x) {
   ifelse(x == "No Data", "No data", x)
 }), .SDcols = testing_cols]
@@ -294,9 +301,9 @@ dx_policy[, (testing_cols) := lapply(.SD, function(x) {
 setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update",
                          "COVID-19 testing strategy available",
                          column_choices$`Molecular testing`,
-                         column_choices$`Antigen testing`,
+                         column_choices$`Professional Use Antigen RDT`,
                          column_choices$`Antibody testing`,
-                         column_choices$`Self testing`
+                         column_choices$`Self-test Antigen RDT`
 ))
 
 # Convert columns to factor/date ----------------

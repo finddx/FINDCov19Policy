@@ -26,6 +26,23 @@ mod_map_ui <- function(id) {
                         )
                       )
              ),
+             tags$div(class = "info-container",
+                      pickerInput(inputId = ns("slt_question"),
+                        label = "Select column to show",
+                        multiple = FALSE,
+                        choices = column_choices[!names(column_choices) %in% "General"],
+                        selected = NULL
+                      ),
+                      
+                      tags$span(
+                        class="info-mark",
+                        icon("info-circle"),
+                        tags$div(
+                          class = "info-mark-text",
+                          tags$p('Please select which question to display when hovering on the map')
+                        )
+                      )
+             ),
              
              echarts4rOutput(ns("map"), height = "450px"),
              
@@ -160,9 +177,10 @@ mod_map_server <- function(input, output, session) {
     
     selected_test_cols <- switch (input$slt_category,
                                   `Molecular Test` = column_choices$`Molecular testing`,
-                                  `Professional Use Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen RDTs"),
+                                  `Professional Use Antigen RDT` = setdiff(column_choices$`Professional Use Antigen RDT`, 
+                                                                           "Any limitations on who can use antigen RDTs"),
                                   `Antibody RDT` = column_choices$`Antibody testing`,
-                                  `Self-test Antigen RDT` = column_choices$`Self testing`
+                                  `Self-test Antigen RDT` = column_choices$`Self-test Antigen RDT`
     )
     
     df %>%
@@ -253,9 +271,9 @@ mod_map_server <- function(input, output, session) {
       
       selected_test_cols <- switch (input$slt_category,
                                     `Molecular Test` = column_choices$`Molecular testing`,
-                                    `Professional Use Antigen RDT` = column_choices$`Antigen testing`,
+                                    `Professional Use Antigen RDT` = column_choices$`Professional Use Antigen RDT`,
                                     `Antibody RDT` = column_choices$`Antibody testing`,
-                                    `Self-test Antigen RDT` = column_choices$`Self testing`
+                                    `Self-test Antigen RDT` = column_choices$`Self-test Antigen RDT`
       )
       
       test_list <- tags$ul(
@@ -325,5 +343,13 @@ mod_map_server <- function(input, output, session) {
     req(input$slt_secondary_detail)
     
     rv$selected_on_map <- input$slt_secondary_detail
+  })
+  
+  # Event: Update question picker based on category -------
+  observeEvent(input$slt_category, {
+    req(input$slt_category)
+    
+    selected <- registration_questions[[input$slt_category]]
+    updatePickerInput(session = session, inputId = "slt_question", selected = selected)
   })
 }
