@@ -7,30 +7,7 @@ mod_policy_table_ui <- function(id) {
           
           p("The table below displays diagnostics policy data:"),
           
-          tags$div(class = "info-container",
-                   prettyRadioButtons(
-                     inputId = ns("rb_group"),
-                     label = NULL,
-                     status = "default",
-                     inline = FALSE,
-                     choices = c(
-                       "by continent aggregation" = "Continent",
-                       "by income group aggregation" = "Income",
-                       "by country details" = "Country"
-                     )
-                   ),
-                   tags$span(
-                     class = "info-mark",
-                     icon("info-circle"),
-                     style = "margin-left: -70px; margin-top: -3px;",
-                     tags$div(
-                       class = "info-mark-text",
-                       tags$p('Please select to display the table by country, continent or income classification')
-                     )
-                   )
-          ),
-          
-          tags$div(class = "info-container",
+          tags$div(class = "info-container", style = "display: flex; align-items: flex-end;",
                    pickerInput(
                      inputId = ns("cb_selected_cols"),
                      label = "Select columns to show",
@@ -42,15 +19,8 @@ mod_policy_table_ui <- function(id) {
                      ),
                      choices = column_choices,
                      selected = default_cols
-                   )
-          ),
-          tags$div(class = "info-container",
-                   prettyCheckbox(ns("cb_show_data"), "Show only countries with data", value = TRUE)
-          ),
-          div(style = "margin-top: 10px;",
-              conditionalPanel("input.rb_group !== 'Country'",
-                               d3Output(ns("d3_legend"), width = "100%", height = "80px"),
-              )
+                   ),
+                   tags$div(prettyCheckbox(ns("cb_show_data"), "Show only countries with data", value = TRUE), style = "margin-left: 20px;")
           ),
           reactable::reactableOutput(ns("tbl_country_list"))
       )
@@ -80,7 +50,7 @@ mod_policy_table_server <- function(input, output, session) {
     df <- dx_policy
     
     # Filter out na rows if needed
-    if (input$cb_show_data && input$rb_group == "Country") {
+    if (input$cb_show_data) {
       na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
       df <- df[na_rows == 0]
     }
@@ -97,7 +67,7 @@ mod_policy_table_server <- function(input, output, session) {
     df <- copy(policy_data())
     
     # Select only cols to show
-    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", input$rb_group), with = FALSE]
+    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", "Continent", "Income"), with = FALSE]
     
     policy_testing <- colnames(df)[colnames(df) == "COVID-19 testing strategy available"]
     molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
@@ -111,79 +81,29 @@ mod_policy_table_server <- function(input, output, session) {
     ) %% 2)])
     
     # Columns list
-    if (input$rb_group == "Country") {
-      columns_list <- list(
-        Flag = colDef(show = FALSE),
-        Country = colDef(html = TRUE, cell = JS("
-                  function(cellInfo) {
-                    var elem = cellInfo.row['Flag'] + cellInfo.value
-                    return elem;
-                  }
-                ")),
-        `Policy links` = colDef(html = TRUE, minWidth = 1000)
-      )
-      columns_list <- c(
-        columns_list,
-        sapply(gray_columns, simplify = FALSE, USE.NAMES = TRUE, function(x) {
-          colDef(
-            style = function(value) {
-              list(`background-color` = "#f7f7f7")
-            },
-            headerStyle = list(`background-color` = "#f7f7f7")
-          )
-        })
-      )
-      
-      columns_list <- columns_list[names(columns_list) %in% c(colnames(df), "Flag", "Country")]
-    } else {
-      # Aggregate: Continent/Income Group
-      testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
-      
-      # Convert values
-      df[, (testing_df_cols) := lapply(.SD, plyr::mapvalues, 
-                                       from = c("No, but used", "In the process of registration", "No Data"), 
-                                       to = c("No", "No", "No data")), .SDcols = testing_df_cols]
-      
-      # Convert NA to No data
-      df[, (testing_df_cols) := lapply(.SD, function(x) ifelse(is.na(x), "No data", as.character(x))), .SDcols = testing_df_cols]
-      
-      df <- lapply(na.omit(unique(df[[input$rb_group]])), function(category) {
-        ds <- lapply(testing_df_cols, function(col) {
-          df2 <- df[get(input$rb_group) == category, ]
-          df2[, list(get_table(df2[[col]]))]
-        })
-        
-        if (length(ds) > 0) {
-          cbind.data.frame(
-            paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
-            ds
-          )
-        } else {
-          data.table(paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"))
-        }
-      }) %>%
-        rbindlist(use.names = FALSE)
-      
-      colnames(df) <- c(input$rb_group, testing_df_cols)
-      
-      columns_list <- sapply(testing_df_cols, simplify = FALSE, USE.NAMES = TRUE, function(x) {
+    columns_list <- list(
+      Flag = colDef(show = FALSE),
+      Country = colDef(html = TRUE, cell = JS("
+                function(cellInfo) {
+                  var elem = cellInfo.row['Flag'] + cellInfo.value
+                  return elem;
+                }
+              ")),
+      `Policy links` = colDef(html = TRUE, minWidth = 1000)
+    )
+    columns_list <- c(
+      columns_list,
+      sapply(gray_columns, simplify = FALSE, USE.NAMES = TRUE, function(x) {
         colDef(
-          cell = function(value, index) {
-            sparkline(df[[x]][[index]], 
-                      sliceColors = c("#cbcbcb", "#cd4651", "#44abb6"), 
-                      type = "pie", height = "35px")
-          },
-          style = if (x %in% gray_columns) {
-            function(value) {
-              list(`background-color` = "#f7f7f7")
-            }
-          },
-          headerStyle = if (x %in% gray_columns) {
+          style = function(value) {
             list(`background-color` = "#f7f7f7")
-          }
+          },
+          headerStyle = list(`background-color` = "#f7f7f7")
         )
       })
-    }
+    )
+    
+    columns_list <- columns_list[names(columns_list) %in% c(colnames(df), "Flag", "Country")]
     
     # Column group list
     gray_column_groups <- cumsum(
@@ -246,18 +166,16 @@ mod_policy_table_server <- function(input, output, session) {
                      columnGroups = columnGroups_list
     )
     
-    if (input$rb_group == "Country") {
-      range_filter_cols <- c("Continent", "Income", "COVID-19 testing strategy available", testing_cols)
-      
-      #filter_cols <- which(colnames(df) %in% testing_cols)
-      columns_name <- sapply(out$x$tag$attribs$columns, `[[`, "name")
-      
-      for (i in range_filter_cols) {
-        if (i %in% columns_name) {
-          idx <- which(i == columns_name)
-          out$x$tag$attribs$columns[[idx]]$filterMethod <- htmlwidgets::JS("filterRange")
-          out$x$tag$attribs$columns[[idx]]$Filter <- build_filter_range(df[[i]])
-        }
+    range_filter_cols <- c("Continent", "Income", "COVID-19 testing strategy available", testing_cols)
+    
+    #filter_cols <- which(colnames(df) %in% testing_cols)
+    columns_name <- sapply(out$x$tag$attribs$columns, `[[`, "name")
+    
+    for (i in range_filter_cols) {
+      if (i %in% columns_name) {
+        idx <- which(i == columns_name)
+        out$x$tag$attribs$columns[[idx]]$filterMethod <- htmlwidgets::JS("filterRange")
+        out$x$tag$attribs$columns[[idx]]$Filter <- build_filter_range(df[[i]])
       }
     }
     
@@ -267,96 +185,19 @@ mod_policy_table_server <- function(input, output, session) {
   # Event: Download selected rows -------------------------
   output$lnk_download_selected <- downloadHandler(
     filename = function() {
-      if (input$rb_group == "Country") {
-        file_extension <- "csv"
-      } else {
-        file_extension <- "xlsx"
-      }
-      paste('data-', Sys.Date(), '.', file_extension, sep='')
+      paste('data-', Sys.Date(), '.csv', sep='')
     },
     content = function(file) {
       req(policy_data())
       df <- copy(policy_data())
-      
-      if (input$rb_group == "Country") {
-        # Country
-        df <- df[, colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
-        if (length(selected() > 0L)) {
-          df <- df[selected()]
-        }
-        
-        fwrite(x = df, file = file)
-      } else {
-        # Continent / Income group
-        categories <- as.character(na.omit(unique(df[[input$rb_group]])))
-        if (length(selected() > 0L)) {
-          categories <- categories[selected()]
-        }
-        testing_df_cols <- testing_cols[testing_cols %in% colnames(df)]
-        
-        # Convert values
-        df[, (testing_df_cols) := lapply(.SD, plyr::mapvalues, 
-                                         from = c("No, but used", "In the process of registration", "No Data"), 
-                                         to = c("No", "No", "No data")), .SDcols = testing_df_cols]
-        
-        # Convert NA to No data
-        df[, (testing_df_cols) := lapply(.SD, function(x) ifelse(is.na(x), "No data", as.character(x))), .SDcols = testing_df_cols]
-        
-        # Aggregation (Yes, No, No data percentages)
-        df <- lapply(categories, function(category) {
-          ds <- lapply(testing_df_cols, function(col) {
-            data.table(
-              df[get(input$rb_group) == category, paste0(round(sum(get(col) == "Yes") / .N * 100, 1), "%")],
-              df[get(input$rb_group) == category, paste0(round(sum(get(col) == "No") / .N * 100, 1), "%")],
-              df[get(input$rb_group) == category, paste0(round(sum(get(col) == "No data") / .N * 100, 1), "%")]
-            ) %>% 
-              setnames(new = paste0(col, " (", c("Yes", "No", "No data"), ")"))
-          })
-          
-          cbind.data.frame(
-            paste0(category, " (", "n = ", df[get(input$rb_group) == category, .N], ")"),
-            ds
-          )
-        }) %>%
-          rbindlist(use.names = FALSE)
-        
-        # Write xlsx
-        wb <- createWorkbook()
-        addWorksheet(wb, sheetName = input$rb_group)
-        
-        # First row
-        writeData(wb, x = t(c(input$rb_group, rep(testing_df_cols, each = 3))), sheet = 1, 
-                  colNames = FALSE, rowNames = FALSE)
-        
-        # Merge cells
-        no_of_cols <- 1 + length(testing_df_cols) * 3
-        
-        for (i in seq(from = 2, to = no_of_cols, by = 3)) { 
-          mergeCells(wb, sheet = 1, cols = seq(from = i, to = i + 2), rows = 1)
-        }
-        
-        mergeCells(wb, sheet = 1, cols = 1, rows = 1:2)
-        
-        # Add second row
-        writeData(wb, x = t(rep(c("Yes (%)", "No (%)", "No data (%)"), times = length(testing_df_cols))), sheet = 1,
-                  startRow = 2, startCol = 2,
-                  colNames = FALSE, rowNames = FALSE)
-        
-        # Add data
-        writeData(wb, x = df, sheet = 1, startRow = 3, startCol = 1, colNames = FALSE, rowNames = FALSE)
-        
-        # Styling
-        addStyle(wb, sheet = 1, style = createStyle(textDecoration = "bold", halign = "center", valign = "center", wrapText = TRUE), 
-                 rows = 1, cols = 1:no_of_cols)
-        addStyle(wb, sheet = 1, style = createStyle(textDecoration = "bold", halign = "center", valign = "center"), 
-                 rows = 2, cols = 1:no_of_cols)
-        addStyle(wb, sheet = 1, style = createStyle(textDecoration = "bold", halign = "center", valign = "center", wrapText = FALSE), 
-                 rows = 1, cols = 1)
-        
-        setColWidths(wb, sheet = 1, ignoreMergedCells = TRUE, cols = seq_len(no_of_cols), widths = "auto")
-        
-        saveWorkbook(wb, file = file)
+    
+      # Country
+      df <- df[, colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+      if (length(selected() > 0L)) {
+        df <- df[selected()]
       }
+      
+      fwrite(x = df, file = file)
     }
   )
   
