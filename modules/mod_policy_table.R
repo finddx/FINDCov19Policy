@@ -30,7 +30,8 @@ mod_policy_table_ui <- function(id) {
       column(width = 12,
              br(),
              h3("Download the data"),
-             p("The selected data can be downloaded from", downloadLink(ns("lnk_download_selected"), label = "here.")),
+             p("The selected data can be downloaded from", downloadLink(ns("lnk_download_selected"), label = "here,"), 
+               "and the raw dataset can be downloaded from", downloadLink(ns("lnk_download_raw"), label = "here.")),
              p(class = "small", paste0("The data were last updated on: ",
                                        format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e%b%Y")
              ))
@@ -199,4 +200,24 @@ mod_policy_table_server <- function(input, output, session) {
       fwrite(x = df, file = file)
     }
   )
+  
+  # Event: Download raw data ------------------------------
+  output$lnk_download_raw <- downloadHandler(
+    filename = function() {
+      paste('raw_data-', Sys.Date(), '.xlsx', sep='')
+    },
+    content = function(file) {
+      file.copy(from = policy_file_path, to = file)
+    }
+  )
+  
+  # Render: Legend ----------------------------------------
+  output$d3_legend <- renderD3( {
+    r2d3(
+      data = list(
+        keys = c('No data', 'No', 'Yes'), 
+        color = c("#cbcbcb", "#cd4651", "#44abb6")
+      ),
+      script = file.path("www", "legend.js"))
+  })
 }
