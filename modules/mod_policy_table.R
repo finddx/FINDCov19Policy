@@ -60,7 +60,8 @@ mod_policy_table_ui <- function(id) {
       column(width = 12,
              br(),
              h3("Download the data"),
-             p("The selected data can be downloaded from", downloadLink(ns("lnk_download_selected"), label = "here.")),
+             p("The selected data can be downloaded from", downloadLink(ns("lnk_download_selected"), label = "here,"), 
+               "and the raw dataset can be downloaded from", downloadLink(ns("lnk_download_raw"), label = "here.")),
              p(class = "small", paste0("The data were last updated on: ",
                                        format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e%b%Y")
              ))
@@ -356,6 +357,16 @@ mod_policy_table_server <- function(input, output, session) {
         
         saveWorkbook(wb, file = file)
       }
+    }
+  )
+  
+  # Event: Download raw data ------------------------------
+  output$lnk_download_raw <- downloadHandler(
+    filename = function() {
+      paste('raw_data-', Sys.Date(), '.xlsx', sep='')
+    },
+    content = function(file) {
+      file.copy(from = policy_file_path, to = file)
     }
   )
   
