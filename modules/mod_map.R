@@ -254,7 +254,8 @@ mod_map_server <- function(input, output, session) {
       selected_test_cols <- switch (input$slt_category,
                                     `Molecular Test` = column_choices$`Molecular testing`,
                                     `Antigen RDT` = column_choices$`Antigen testing`,
-                                    `Antibody RDT` = column_choices$`Antibody testing`
+                                    `Antibody RDT` = column_choices$`Antibody testing`,
+                                    `Self Test` = column_choices$`Self testing`
       )
       
       test_list <- tags$ul(
