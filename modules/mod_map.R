@@ -30,7 +30,7 @@ mod_map_ui <- function(id) {
                       pickerInput(inputId = ns("slt_question"),
                         label = "Select column to show",
                         multiple = FALSE,
-                        choices = column_choices[!names(column_choices) %in% "General"],
+                        choices = NULL,
                         selected = NULL
                       ),
                       
@@ -81,22 +81,13 @@ mod_map_server <- function(input, output, session) {
   ns <- session$ns
   
   # Reactive values ---------------------------------------
-  rv <- reactiveValues(selected_on_map = NULL)
+  rv <- reactiveValues(selected_on_map = NULL, params = NULL)
   
   # Render Map --------------------------------------------
   output$map <- renderEcharts4r( {
-    req(input$slt_category)
+    req(rv$params)
     
-    if (input$slt_category == "Molecular Test") {
-      value <- "Molecular test registered in country"
-    } else if (input$slt_category == "Professional Use Antigen RDT") {
-      value <- "Antigen RDTs registered in country"
-    } else if (input$slt_category == "Antibody RDT") {
-      value <- "Antibody RDTs registered in country"
-    } else if (input$slt_category == "Self-test Antigen RDT") {
-      value <- "Self tests registered for use in country"
-    }
-    
+    value <- rv$params$value
     theme <- "grey"
     
     df <- copy(data_map)
@@ -175,7 +166,7 @@ mod_map_server <- function(input, output, session) {
     df[, value := ifelse(is.na(df$value), "No data", df$value)]
     df[, value := value_lookup[df$value]]
     
-    selected_test_cols <- input$slt_question
+    selected_test_cols <- rv$params$question
     
     df %>%
       e_charts(name, dispose = FALSE) %>% 
@@ -264,9 +255,9 @@ mod_map_server <- function(input, output, session) {
       df <- df[1, ]
       
       selected_test_cols <- switch (input$slt_category,
-                                    `Molecular Test` = column_choices$`Molecular testing`,
+                                    `Molecular Test` = column_choices$`Molecular Test`,
                                     `Professional Use Antigen RDT` = column_choices$`Professional Use Antigen RDT`,
-                                    `Antibody RDT` = column_choices$`Antibody testing`,
+                                    `Antibody RDT` = column_choices$`Antibody RDT`,
                                     `Self-test Antigen RDT` = column_choices$`Self-test Antigen RDT`
       )
       
@@ -343,7 +334,31 @@ mod_map_server <- function(input, output, session) {
   observeEvent(input$slt_category, {
     req(input$slt_category)
     
+    choices <- column_choices[[input$slt_category]]
     selected <- registration_questions[[input$slt_category]]
-    updatePickerInput(session = session, inputId = "slt_question", selected = selected)
+    
+    if (input$slt_category == "Molecular Test") {
+      value <- "Molecular test registered in country"
+    } else if (input$slt_category == "Professional Use Antigen RDT") {
+      value <- "Antigen RDTs registered in country"
+    } else if (input$slt_category == "Antibody RDT") {
+      value <- "Antibody RDTs registered in country"
+    } else if (input$slt_category == "Self-test Antigen RDT") {
+      value <- "Self tests registered for use in country"
+    }
+    
+    # Set reactive value
+    rv$params <- list(
+      value = value,
+      question = selected
+    )
+    
+    # Update picker
+    updatePickerInput(session = session, inputId = "slt_question", choices = choices, selected = selected)
+  })
+  
+  # Event: Set reactive value from input$slt_question
+  observeEvent(input$slt_question, {
+    rv$params$question <- input$slt_question
   })
 }
