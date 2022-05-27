@@ -28,7 +28,7 @@ mod_map_ui <- function(id) {
              ),
              tags$div(class = "info-container",
                       pickerInput(inputId = ns("slt_question"),
-                        label = "Select column to show",
+                        label = "Select question of interest",
                         multiple = FALSE,
                         choices = NULL,
                         selected = NULL
