@@ -127,30 +127,15 @@ mod_map_server <- function(input, output, session) {
       e_theme(theme) %>% 
       e_tooltip(formatter = htmlwidgets::JS("
         function(params) {
-          var value;
-          
-          if (params.value === 0) {
-            value = 'NA';
-          } else if (params.value === 1) {
-            value = 'No data';
-          } else if (params.value === 2) {
-            value = 'No';
-          } else if (params.value === 3) {
-            value = 'Yes';
-          } else {
-            value = '';
-          };
-          
-          //var test_cols = '%s';
-          var test_cols = $('[data-id=\"mod_map-slt_question\"]').text();
+          var test_cols = $('[data-id=\"mod_map-slt_question\"]').attr('title');
           var testcolArray = test_cols.split('|');
           var list = '';
           
           for (i = 0; i < testcolArray.length; i++) {
             var key = testcolArray[i];
             var paramValue = 'No data';
-            
-            if (params.data.hasOwnProperty(key) && params.data[key] !== null) {
+
+            if (params.data !== undefined && params.data.hasOwnProperty(key) && params.data[key] !== null) {
               paramValue = params.data[key];
             }
             list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
