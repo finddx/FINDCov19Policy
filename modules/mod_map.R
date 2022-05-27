@@ -3,7 +3,7 @@ mod_map_ui <- function(id) {
   tagList(
     fluidRow(
       column(width = 12,
-             h3(id = "world-view", class = "mt-0 pt-0", "Are tests registered in the country?")
+             h3(id = "world-view", class = "mt-0 pt-0", "Tests used and registered in the countries")
       )
     ),
     
