@@ -81,13 +81,13 @@ mod_map_server <- function(input, output, session) {
   ns <- session$ns
   
   # Reactive values ---------------------------------------
-  rv <- reactiveValues(selected_on_map = NULL, params = NULL)
+  rv <- reactiveValues(selected_on_map = NULL, value = NULL)
   
   # Render Map --------------------------------------------
   output$map <- renderEcharts4r( {
-    req(rv$params)
+    req(rv$value)
     
-    value <- rv$params$value
+    value <- rv$value
     theme <- "grey"
     
     df <- copy(data_map)
@@ -166,8 +166,6 @@ mod_map_server <- function(input, output, session) {
     df[, value := ifelse(is.na(df$value), "No data", df$value)]
     df[, value := value_lookup[df$value]]
     
-    selected_test_cols <- rv$params$question
-    
     df %>%
       e_charts(name, dispose = FALSE) %>% 
       e_map_register("WORLD", geojson) %>% 
@@ -186,8 +184,8 @@ mod_map_server <- function(input, output, session) {
         
         inRange = list(color = colors), # scale colors
       ) %>%
-      e_theme(theme) %>%
-      e_tooltip(formatter = htmlwidgets::JS(sprintf("
+      e_theme(theme) %>% 
+      e_tooltip(formatter = htmlwidgets::JS("
         function(params) {
           console.log(params);
           var value;
@@ -204,7 +202,8 @@ mod_map_server <- function(input, output, session) {
             value = '';
           };
           
-          var test_cols = '%s';
+          //var test_cols = '%s';
+          var test_cols = $('[data-id=\"mod_map-slt_question\"]').text();
           var testcolArray = test_cols.split('|');
           var list = '';
           
@@ -218,21 +217,9 @@ mod_map_server <- function(input, output, session) {
             list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
           } 
           
-          //var links = (params.data['Policy links']);
-          
-          //'</h4>' + '%s' + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + 
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }
-      ", paste0(selected_test_cols, collapse = "|"), value))#, 
-                # position = JS("function (pos, params, dom, rect, size) {
-                #   // tooltip will be fixed on the right if mouse hovering on the left,
-                #   // and on the left if hovering on the right.
-                #   var obj = {top: 60};
-                #   obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
-                #   return obj;
-                # }"),
-                # backgroundColor = 'rgba(255, 255, 255, 0.6)'
-      )
+      "))
   })
   
   # Event: User clicked on map ----------------------------
@@ -348,17 +335,9 @@ mod_map_server <- function(input, output, session) {
     }
     
     # Set reactive value
-    rv$params <- list(
-      value = value,
-      question = selected
-    )
+    rv$value <- value
     
     # Update picker
     updatePickerInput(session = session, inputId = "slt_question", choices = choices, selected = selected)
-  })
-  
-  # Event: Set reactive value from input$slt_question
-  observeEvent(input$slt_question, {
-    rv$params$question <- input$slt_question
   })
 }
