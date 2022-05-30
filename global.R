@@ -39,7 +39,7 @@ wb_classification[, Income := `Income group`]
 wb_classification[, `Income group` := NULL]
 
 # Read dx policy --------------------------------
-policy_file_path <- "data/Policy_Mapping_v2.xlsx"
+policy_file_path <- "data/Policy_Mapping.xlsx"
 dx_policy <- readxl::read_xlsx(policy_file_path)
 setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
@@ -58,67 +58,45 @@ names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("Are self[
 setnames(dx_policy,
          old = c(
            "Does the country have a policy that guides COVID-19 testing strategy?",
+           
            "Is molecular testing registered for use in country?",
            "Is molecular testing used to confirm a COVID-19 diagnosis?",
+           
            "Are antigen rapid tests registered for use in country?",
            "Are antigen rapid tests used to confirm COVID-19 diagnosis?",
-           "Are antigen rapid tests used for the testing of symptomatic patients?",
-           "Are antigen rapid tests used for the screening of asymptomatic patients?",
-
-           "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
-           "Are antigen rapid tests used for testing of health care workers / front line staff?",
-           "Are antigen rapid tests used for testing at borders / points of entry?",
-           "Are antigen rapid tests used for testing at schools / workplaces?",
-           "Are antigen rapid tests used for testing for non COVID-19 hospitalized patients (e.g., scheduled or elective surgery)?",
-           "Who is allowed to use the Ag-RDTs (only health workers etc)?",
+           "Can antigen rapid tests be used for the testing/screening of symptomatic cases?",
+           "Can antigen rapid tests be used for the testing/screening of asymptomatic populations?",
 
            "Are antibody rapid tests registered for use in country?",
            "Are antibody rapid tests used to confirm a COVID-19 diagnosis?",
            "Are antibody rapid tests used for serosurveillance studies of COVID-19?",
            
            # Self Tests
-           "Self tests used in the screening of contacts of know COVID-19 cases?",
-           "Is self-testing for COVID-19 allowed in the country?",
+           "Does the country have a policy guiding COVID-19 self-testing?",
            "Self tests registered for use in country?",
-           "Self tests used in the screening of symptomatic patients?",
-           "Self tests used in the screening of HCWs / front-line staff?",
-           "Self tests used in the screening of asymptomatic populations?",
-           "Self tests used at schools?",
-           "Self tests used at workplaces?",
-           "Self tests used at borders/travel?",
-           "Self tests used at Outpatient Departments (OPDs)?"
+           "Can self-tests used in the testing/screening of symptomatic patients?",
+           "Can self-tests used in the testing/screening of asymptomatic populations?"
          ),
          new = c(
            "COVID-19 testing strategy available",
+           
            "Molecular test registered in country",
            "Molecular test used to confirm COVID-19 diagnosis",
+           
            "Antigen RDTs registered in country",
            "Antigen RDTs used to confirm COVID-19 diagnosis",
            "Antigen RDTs used for testing symptomatic cases",
            "Antigen RDTs used for testing asymptomatic populations",
-
-           "Antigen RDTs used for contact tracing",
-           "Antigen RDTs used for HCWs",
-           "Antigen RDTs used at borders",
-           "Antigen RDTs used at schools/workplaces",
-           "Antigen RDTs used for non COVID-19 hospitalized patients",
-           "Who can be tested with Antigen RDTs",
 
            "Antibody RDTs registered in country",
            "Antibody RDTs used to confirm COVID-19 diagnosis",
            "Antibody RDTs used for serosurveillance studies of COVID-19",
            
            # Self Tests
-           "Self tests used in the screening of contacts of confirmed or suspected cases",
            "Does the country have a policy guiding COVID-19 self-testing",
            "Self tests registered for use in country",
            "Self tests used in the screening of symptomatic cases",
-           "Self tests used in the screening of HCWs",
-           "Self tests used in the screening of asymptomatic populations",
-           "Self tests used at schools",
-           "Self tests used at workplaces",
-           "Self tests used at borders/travel",
-           "Self tests used at Outpatient Departments (OPDs)"
+           "Self tests used in the screening of asymptomatic populations"
          ))
 
 # Remove extra whitespace from policy links
@@ -218,11 +196,6 @@ testing_cols <- c("COVID-19 testing strategy available",
                   "Antigen RDTs used to confirm COVID-19 diagnosis",
                   "Antigen RDTs used for testing symptomatic cases",
                   "Antigen RDTs used for testing asymptomatic populations",
-                  "Antigen RDTs used for contact tracing",
-                  "Antigen RDTs used for HCWs",
-                  "Antigen RDTs used at borders",
-                  "Antigen RDTs used at schools/workplaces",
-                  "Antigen RDTs used for non COVID-19 hospitalized patients",
 
                   "Antibody RDTs registered in country",
                   "Antibody RDTs used to confirm COVID-19 diagnosis",
@@ -231,13 +204,7 @@ testing_cols <- c("COVID-19 testing strategy available",
                   "Does the country have a policy guiding COVID-19 self-testing",
                   "Self tests registered for use in country",
                   "Self tests used in the screening of symptomatic cases",
-                  "Self tests used in the screening of contacts of confirmed or suspected cases",
-                  "Self tests used in the screening of HCWs",
-                  "Self tests used in the screening of asymptomatic populations",
-                  "Self tests used at schools",
-                  "Self tests used at workplaces",
-                  "Self tests used at borders/travel",
-                  "Self tests used at Outpatient Departments (OPDs)")
+                  "Self tests used in the screening of asymptomatic populations")
 
 column_choices <- list(
   General = c(
@@ -261,25 +228,13 @@ column_choices <- list(
     "Antigen RDTs registered in country",
     "Antigen RDTs used to confirm COVID-19 diagnosis",
     "Antigen RDTs used for testing symptomatic cases",
-    "Antigen RDTs used for testing asymptomatic populations",
-    "Antigen RDTs used for contact tracing",
-    "Antigen RDTs used for HCWs",
-    "Antigen RDTs used at borders",
-    "Antigen RDTs used at schools/workplaces",
-    "Antigen RDTs used for non COVID-19 hospitalized patients",
-    "Who can be tested with Antigen RDTs"
+    "Antigen RDTs used for testing asymptomatic populations"
   ),
   `Self-test Antigen RDT` = c(
     "Does the country have a policy guiding COVID-19 self-testing",
     "Self tests registered for use in country",
     "Self tests used in the screening of symptomatic cases",
-    "Self tests used in the screening of contacts of confirmed or suspected cases",
-    "Self tests used in the screening of HCWs",
-    "Self tests used in the screening of asymptomatic populations",
-    "Self tests used at schools",
-    "Self tests used at workplaces",
-    "Self tests used at borders/travel",
-    "Self tests used at Outpatient Departments (OPDs)"
+    "Self tests used in the screening of asymptomatic populations"
   )
 )
 
@@ -309,7 +264,8 @@ setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last
 # Convert columns to factor/date ----------------
 factor_cols <- public_cols[!public_cols %in% c("Policy links", "Date of last update")]
 dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
-dx_policy[, `Date of last update` := as_date(`Date of last update`)]
+dx_policy[, `Date of last update` := parse_excel_date(`Date of last update`)]
+#dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 
 value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 2, "In the process of registration" = 2, "No" = 2, "Yes" = 3)
 
