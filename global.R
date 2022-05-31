@@ -57,16 +57,25 @@ names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("Are self[
 # Simplify questions
 setnames(dx_policy,
          old = c(
+           # General
            "Does the country have a policy that guides COVID-19 testing strategy?",
+           "What is the choice of test (i.e PCR or AgRDT) in order of priority?",
            
+           # Molecular tests
            "Is molecular testing registered for use in country?",
            "Is molecular testing used to confirm a COVID-19 diagnosis?",
+           "What is the policy recommendation for where to use PCR tests?",
+           "Who are the trained operators allowed to administer the PCR test?",
            
+           # Professional use Antigen
            "Are antigen rapid tests registered for use in country?",
            "Are antigen rapid tests used to confirm COVID-19 diagnosis?",
            "Can antigen rapid tests be used for the testing/screening of symptomatic cases?",
            "Can antigen rapid tests be used for the testing/screening of asymptomatic populations?",
+           "What is the policy recommendation for where to use AgRDT tests?",
+           "Who are the trained operators allowed to administer the Ag-RDT test?",
 
+           # Antibody
            "Are antibody rapid tests registered for use in country?",
            "Are antibody rapid tests used to confirm a COVID-19 diagnosis?",
            "Are antibody rapid tests used for serosurveillance studies of COVID-19?",
@@ -78,16 +87,25 @@ setnames(dx_policy,
            "Can self-tests used in the testing/screening of asymptomatic populations?"
          ),
          new = c(
+           # General
            "COVID-19 testing strategy available",
+           "What is the choice of test (i.e molecular or antigen rapid test) in order of priority?",
            
+           # Molecular tests
            "Molecular test registered in country",
            "Molecular test used to confirm COVID-19 diagnosis",
+           "What is the policy recommendation for where to use molecular tests?",
+           "Who are the trained operators allowed to administer molecular tests?",
            
+           # Professional use Antigen
            "Antigen RDTs registered in country",
            "Antigen RDTs used to confirm COVID-19 diagnosis",
            "Antigen RDTs used for testing symptomatic cases",
            "Antigen RDTs used for testing asymptomatic populations",
+           "What is the policy recommendation for where to use antigen rapid tests?",
+           "Who are the trained operators allowed to administer antigen rapid tests?",
 
+           # Antibody
            "Antibody RDTs registered in country",
            "Antibody RDTs used to confirm COVID-19 diagnosis",
            "Antibody RDTs used for serosurveillance studies of COVID-19",
@@ -187,25 +205,6 @@ default_cols <- c("Country",
                   "Self tests registered for use in country",
                   "Self tests used in the screening of symptomatic cases")
 
-testing_cols <- c("COVID-19 testing strategy available",
-
-                  "Molecular test registered in country",
-                  "Molecular test used to confirm COVID-19 diagnosis",
-
-                  "Antigen RDTs registered in country",
-                  "Antigen RDTs used to confirm COVID-19 diagnosis",
-                  "Antigen RDTs used for testing symptomatic cases",
-                  "Antigen RDTs used for testing asymptomatic populations",
-
-                  "Antibody RDTs registered in country",
-                  "Antibody RDTs used to confirm COVID-19 diagnosis",
-                  "Antibody RDTs used for serosurveillance studies of COVID-19",
-                  
-                  "Does the country have a policy guiding COVID-19 self-testing",
-                  "Self tests registered for use in country",
-                  "Self tests used in the screening of symptomatic cases",
-                  "Self tests used in the screening of asymptomatic populations")
-
 column_choices <- list(
   General = c(
     "Country",
@@ -213,11 +212,14 @@ column_choices <- list(
     "Income",
     "Date of last update",
     "COVID-19 testing strategy available",
+    "What is the choice of test (i.e molecular or antigen rapid test) in order of priority?",
     "Policy links"
   ),
   `Molecular Test` = c(
     "Molecular test registered in country",
-    "Molecular test used to confirm COVID-19 diagnosis"
+    "Molecular test used to confirm COVID-19 diagnosis",
+    "What is the policy recommendation for where to use molecular tests?",
+    "Who are the trained operators allowed to administer molecular tests?"
   ),
   `Antibody RDT` = c(
     "Antibody RDTs registered in country",
@@ -228,7 +230,9 @@ column_choices <- list(
     "Antigen RDTs registered in country",
     "Antigen RDTs used to confirm COVID-19 diagnosis",
     "Antigen RDTs used for testing symptomatic cases",
-    "Antigen RDTs used for testing asymptomatic populations"
+    "Antigen RDTs used for testing asymptomatic populations",
+    "What is the policy recommendation for where to use antigen rapid tests?",
+    "Who are the trained operators allowed to administer antigen rapid tests?"
   ),
   `Self-test Antigen RDT` = c(
     "Does the country have a policy guiding COVID-19 self-testing",
@@ -237,6 +241,9 @@ column_choices <- list(
     "Self tests used in the screening of asymptomatic populations"
   )
 )
+
+testing_cols <- unlist(c(column_choices$`Molecular Test`, column_choices$`Antibody RDT`, column_choices$`Professional Use Antigen RDT`, 
+                       column_choices$`Self-test Antigen RDT`))
 
 registration_questions <- list(
   `Molecular Test` = "Molecular test registered in country",
