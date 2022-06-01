@@ -151,7 +151,8 @@ mod_map_server <- function(input, output, session) {
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }
       "))
-  })
+  }) %>% 
+    bindCache(input$slt_question)
   
   # Event: User clicked on map ----------------------------
   observeEvent(input$map_clicked_data, {
