@@ -131,7 +131,7 @@ mod_map_server <- function(input, output, session) {
         
         inRange = list(color = colors), # scale colors
       ) %>%
-      e_theme(theme) %>% 
+      #e_theme(theme) %>% 
       e_tooltip(formatter = htmlwidgets::JS("
         function(params) {
           var test_cols = $('[data-id=\"mod_map-slt_question\"]').attr('title');
