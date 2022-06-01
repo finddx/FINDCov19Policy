@@ -18,6 +18,7 @@ library(sparkline)
 library(r2d3)
 library(openxlsx)
 library(urltools)
+library(cachem)
 
 # Set locale to English for date formatting
 #Sys.setlocale("LC_ALL","English")
@@ -297,3 +298,6 @@ value_lookup2 <- c("NA" = 1, "No data" = 1, "No Data" = 1, "Data available" = 2)
 #' Source: https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json
 #' Modifications: Somaliland merged into Somalia, Northern Cyprus merged into Cyprus
 geojson <- jsonlite::read_json(file.path("map", "countries.geo.json"))
+
+# Store cache persistently
+shinyOptions(cache = cachem::cache_disk(file.path("cache")))
