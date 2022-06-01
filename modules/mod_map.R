@@ -85,9 +85,9 @@ mod_map_server <- function(input, output, session) {
   
   # Render Map --------------------------------------------
   output$map <- renderEcharts4r( {
-    req(rv$value)
+    req(input$slt_question)
     
-    value <- rv$value
+    value <- input$slt_question
     theme <- "grey"
     
     df <- copy(data_map)
@@ -98,13 +98,20 @@ mod_map_server <- function(input, output, session) {
     # Adjust country names
     df[, name := get_recoded_countries(name)]
     
-    # Get colors and labels
-    colors <- get_map_colors(df[[value]])
-    label <- get_map_labels(df[[value]])
-    
     df$value <- df[[value]]
-    df[, value := ifelse(is.na(df$value), "No data", df$value)]
-    df[, value := value_lookup[df$value]]
+    if (input$slt_question %in% testing_cols) {
+      colors <- get_map_colors(df[[value]])
+      label <- get_map_labels(df[[value]])
+      
+      df[, value := ifelse(is.na(df$value), "No data", df$value)]
+      df[, value := value_lookup[df$value]]
+    } else {
+      colors <- get_map_colors(df[[value]], yesno = FALSE)
+      label <- get_map_labels(df[[value]], yesno = FALSE)
+      
+      df[, value := ifelse(is.na(df$value), "No data", "Data available")]
+      df[, value := value_lookup2[df$value]]
+    }
     
     df %>%
       e_charts(name, dispose = FALSE) %>% 
@@ -139,7 +146,7 @@ mod_map_server <- function(input, output, session) {
               paramValue = params.data[key];
             }
             list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
-          } 
+          }
           
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }

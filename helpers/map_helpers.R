@@ -1,29 +1,52 @@
-get_map_colors <- function(x) {
-  c(
-    if ("No data" %in% x) {
-      "#cbcbcb"
-    },
-    if ("No" %in% x) {
-      "#cd4651"
-    },
-    if ("Yes" %in% x) {
-      "#44abb6"
-    }
-  )
+get_map_colors <- function(x, yesno = TRUE) {
+  if (isTRUE(yesno)) {
+    c(
+      if ("No data" %in% x) {
+        "#cbcbcb"
+      },
+      if ("No" %in% x) {
+        "#cd4651"
+      },
+      if ("Yes" %in% x) {
+        "#44abb6"
+      }
+    )
+  } else {
+    c(
+      if (any(is.na(x))) {
+        "#cbcbcb"
+      },
+      if (any(!is.na(x))) {
+        "#44abb6"
+      }
+    )
+  }
 }
 
-get_map_labels <- function(x) {
-  label <- list(
-    if ("No data" %in% x) {
-      list(min = 1, max = 1, label = "No data")
-    },
-    if ("No" %in% x) {
-      list(min = 2, max = 2, label = "No")
-    },
-    if ("Yes" %in% x) {
-      list(min = 3, max = 3, label = "Yes")
-    }
-  )
+get_map_labels <- function(x, yesno = TRUE) {
+  if (isTRUE(yesno)) {
+    label <- list(
+      if ("No data" %in% x) {
+        list(min = 1, max = 1, label = "No data")
+      },
+      if ("No" %in% x) {
+        list(min = 2, max = 2, label = "No")
+      },
+      if ("Yes" %in% x) {
+        list(min = 3, max = 3, label = "Yes")
+      }
+    )
+  } else {
+    label <- list(
+      if (any(is.na(x))) {
+        list(min = 1, max = 1, label = "No data")
+      },
+      if (any(!is.na(x))) {
+        list(min = 2, max = 2, label = "Data available")
+      }
+    )
+  }
+  
   label[sapply(label, is.null)] <- NULL
   label
 }
