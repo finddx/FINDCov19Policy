@@ -109,7 +109,7 @@ mod_map_server <- function(input, output, session) {
       colors <- get_map_colors(df[[value]], yesno = FALSE)
       label <- get_map_labels(df[[value]], yesno = FALSE)
       
-      df[, value := ifelse(is.na(df$value), "No data", "Data available")]
+      df[, value := ifelse(df$value %in% c(NA_character_, "", "No data", "No Data"), "No data", "Data available")]
       df[, value := value_lookup2[df$value]]
     }
     
