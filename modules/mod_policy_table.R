@@ -3,7 +3,7 @@ mod_policy_table_ui <- function(id) {
   tagList(
     fluidRow(
       div(class = "col-sm-12",
-          h3(id = "compare", "Diagnostic Policy Table"),
+          h3(id = "compare", "Diagnostics Policy Table"),
           
           p("The table below displays diagnostics policy data:"),
           
