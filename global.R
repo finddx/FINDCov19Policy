@@ -218,9 +218,7 @@ column_choices <- list(
   ),
   `Molecular Test` = c(
     "Molecular test registered in country",
-    "Molecular test used to confirm COVID-19 diagnosis",
-    "Policy recommendation on where to use molecular tests",
-    "Trained operators administering molecular tests"
+    "Molecular test used to confirm COVID-19 diagnosis"
   ),
   `Antibody RDT` = c(
     "Antibody RDTs registered in country",
@@ -231,9 +229,7 @@ column_choices <- list(
     "Antigen RDTs registered in country",
     "Antigen RDTs used to confirm COVID-19 diagnosis",
     "Antigen RDTs used for testing symptomatic cases",
-    "Antigen RDTs used for testing asymptomatic populations",
-    "Policy recommendation on where to use antigen rapid tests",
-    "Trained operators administering antigen rapid tests"
+    "Antigen RDTs used for testing asymptomatic populations"
   ),
   `Self-test Antigen RDT` = c(
     "Does the country have a policy guiding COVID-19 self-testing",
