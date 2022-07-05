@@ -84,7 +84,7 @@ setnames(dx_policy,
            # Self Tests
            "Does the country have a policy guiding COVID-19 self-testing?",
            "Self tests registered for use in country?",
-           "Can self-tests used in the testing/screening of symptomatic patients?",
+           "Can self-tests be used in the testing/screening of symptomatic patients?",
            "Can self-tests used in the testing/screening of asymptomatic populations?"
          ),
          new = c(
