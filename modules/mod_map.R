@@ -152,7 +152,7 @@ mod_map_server <- function(input, output, session) {
         }
       "))
   }) %>% 
-    bindCache(input$slt_question)
+    bindCache(input$slt_question, file.info("data/Policy_Mapping.xlsx")["mtime"])
   
   # Event: User clicked on map ----------------------------
   observeEvent(input$map_clicked_data, {
