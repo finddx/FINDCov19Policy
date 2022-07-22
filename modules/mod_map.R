@@ -152,7 +152,7 @@ mod_map_server <- function(input, output, session) {
         }
       "))
   }) %>% 
-    bindCache(input$slt_question, input$i_roam, lubridate::as_datetime(file.info("data/Policy_Mapping.xlsx")$mtime))
+    bindCache(input$slt_question, input$i_roam, unname(tools::md5sum("data/Policy_Mapping.xlsx")))
   
   # Event: User clicked on map ----------------------------
   observeEvent(input$map_clicked_data, {
