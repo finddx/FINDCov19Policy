@@ -3,7 +3,7 @@ mod_policy_table_ui <- function(id) {
   tagList(
     fluidRow(
       div(class = "col-sm-12",
-          h3(id = "compare", "Diagnostic Policy Table"),
+          h3(id = "compare", "Diagnostics Policy Table"),
           
           p("The table below displays diagnostics policy data:"),
           
@@ -70,10 +70,10 @@ mod_policy_table_server <- function(input, output, session) {
     df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", "Continent", "Income"), with = FALSE]
     
     policy_testing <- colnames(df)[colnames(df) == "COVID-19 testing strategy available"]
-    molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular testing`]
-    antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Antigen testing`]
-    antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody testing`]
-    self_testing <- colnames(df)[colnames(df) %in% column_choices$`Self testing`]
+    molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular Test`]
+    antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Professional Use Antigen RDT`]
+    antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody RDT`]
+    self_testing <- colnames(df)[colnames(df) %in% column_choices$`Self-test Antigen RDT`]
     
     testing_cols_list <- list(policy_testing, molecular_testing, antigen_testing, antibody_testing, self_testing)
     gray_columns <- unlist(testing_cols_list[as.logical(cumsum(
@@ -116,19 +116,19 @@ mod_policy_table_server <- function(input, output, session) {
                  headerStyle = if (gray_column_groups[1]) list(`background-color` = "#f7f7f7"))
       },
       if (length(molecular_testing) > 0) {
-        colGroup(name = "Molecular testing", columns = molecular_testing,
+        colGroup(name = "Molecular Test", columns = molecular_testing,
                  headerStyle = if (gray_column_groups[2]) list(`background-color` = "#f7f7f7"))
-      },
-      if (length(antigen_testing) > 0) {
-        colGroup(name = "Antigen RDTs", columns = antigen_testing,
-                 headerStyle = if (gray_column_groups[3]) list(`background-color` = "#f7f7f7"))
       },
       if (length(antibody_testing) > 0) {
         colGroup(name = "Antibody RDTs", columns = antibody_testing,
                  headerStyle = if (gray_column_groups[4]) list(`background-color` = "#f7f7f7"))
       },
+      if (length(antigen_testing) > 0) {
+        colGroup(name = "Professional Use Antigen RDT", columns = antigen_testing,
+                 headerStyle = if (gray_column_groups[3]) list(`background-color` = "#f7f7f7"))
+      },
       if (length(self_testing) > 0) {
-        colGroup(name = "Self testing", columns = self_testing,
+        colGroup(name = "Self-test Antigen RDT", columns = self_testing,
                  headerStyle = if (gray_column_groups[5]) list(`background-color` = "#f7f7f7"))
       }
     )

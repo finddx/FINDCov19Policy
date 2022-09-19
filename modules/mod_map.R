@@ -3,7 +3,7 @@ mod_map_ui <- function(id) {
   tagList(
     fluidRow(
       column(width = 12,
-             h3(id = "world-view", class = "mt-0 pt-0", "Are tests registered in the country?")
+             h3(id = "world-view", class = "mt-0 pt-0", "Tests used and registered in the countries")
       )
     ),
     
@@ -13,7 +13,7 @@ mod_map_ui <- function(id) {
                       prettyRadioButtons(
                         inputId = ns("slt_category"),
                         label = NULL,
-                        choices = c("Molecular Test", "Antigen RDT", "Antibody RDT", "Self Test"),
+                        choices = c("Molecular Test", "Antibody RDT", "Professional Use Antigen RDT", "Self-test Antigen RDT"),
                         status = "default",
                         inline = TRUE
                       ),
@@ -23,6 +23,23 @@ mod_map_ui <- function(id) {
                         tags$div(
                           class = "info-mark-text",
                           tags$p('Please select to display whether Molecular/Antigen/Antibody testing is registered for use in countries')
+                        )
+                      )
+             ),
+             tags$div(class = "info-container",
+                      pickerInput(inputId = ns("slt_question"),
+                        label = "Select question of interest",
+                        multiple = FALSE,
+                        choices = NULL,
+                        selected = NULL
+                      ),
+                      
+                      tags$span(
+                        class="info-mark",
+                        icon("info-circle"),
+                        tags$div(
+                          class = "info-mark-text",
+                          tags$p('Please select which question to display when hovering on the map')
                         )
                       )
              ),
@@ -64,22 +81,13 @@ mod_map_server <- function(input, output, session) {
   ns <- session$ns
   
   # Reactive values ---------------------------------------
-  rv <- reactiveValues(selected_on_map = NULL)
+  rv <- reactiveValues(selected_on_map = NULL, value = NULL)
   
   # Render Map --------------------------------------------
   output$map <- renderEcharts4r( {
-    req(input$slt_category)
+    req(input$slt_question)
     
-    if (input$slt_category == "Molecular Test") {
-      value <- "Molecular test registered in country"
-    } else if (input$slt_category == "Antigen RDT") {
-      value <- "Antigen RDTs registered in country"
-    } else if (input$slt_category == "Antibody RDT") {
-      value <- "Antibody RDTs registered in country"
-    } else if (input$slt_category == "Self Test") {
-      value <- "Self tests registered for use in country"
-    }
-    
+    value <- input$slt_question
     theme <- "grey"
     
     df <- copy(data_map)
@@ -88,82 +96,22 @@ mod_map_server <- function(input, output, session) {
     df[Country == "Kosovo", name := "Kosovo"]
     
     # Adjust country names
-    df[, name := dplyr::recode(name,
-                               "Bahamas" = "The Bahamas",
-                               "Dominican Rep." = "Dominican Republic",
-                               "Tanzania" = "United Republic of Tanzania",
-                               "Eq. Guinea" = "Equatorial Guinea",
-                               "Timor-Leste" = "East Timor",
-                               "Solomon Is." = "Solomon Islands",
-                               "United States" = "United States of America",
-                               "Dem. Rep. Congo" = "Democratic Republic of the Congo",
-                               "Congo, Dem. Rep." = "Democratic Republic of the Congo",
-                               "Congo" = "Republic of the Congo",
-                               "W. Sahara" = "Western Sahara",
-                               "S. Sudan" = "South Sudan",
-                               "Korea" = "North Korea",
-                               "Dem. Rep. Korea" = "South Korea",
-                               "Guinea-Bissau" = "Guinea Bissau",
-                               "Serbia" = "Republic of Serbia",
-                               
-                               "Myanmar (Burma)" = "Myanmar",
-                               "Laos" = "Lao PDR",
-                               "Côte d’Ivoire" = "Ivory Coast",
-                               "Czech Rep." = "Czech Republic",
-                               "Eswatini" = "Swaziland",
-                               "Falkland Islands" = "Falkland Is.",
-                               "South Georgia & South Sandwich Islands" = "S. Geo. and S. Sandw. Is.",
-                               "French Southern Territories" = "French Southern and Antarctic Lands",
-                               "British Indian Ocean Territory" = "Br. Indian Ocean Ter.",
-                               "Bosnia and Herz." = "Bosnia and Herzegovina",
-                               "North Macedonia" = "Macedonia",
-                               "Heard & McDonald Islands" = "Heard I. and McDonald Is.",
-                               "Micronesia (Federated States of)" = "Micronesia",
-                               "Trinidad & Tobago" = "Trinidad and Tobago",
-                               "St. Vincent & Grenadines" = "St. Vin. and Gren.",
-                               "St. Lucia" = "Saint Lucia",
-                               "Antigua & Barbuda" = "Antigua",
-                               "U.S. Virgin Islands" = "U.S. Virgin Is.",
-                               "Faroe Islands" = "Faeroe Is.",
-                               "Åland Islands" = "Aland",
-                               "Central African Rep." = "Central African Republic"
-    )]
-    
-    colors <- c(
-      if ("No data" %in% df[[value]]) {
-        "#cbcbcb"
-      },
-      if ("No" %in% df[[value]]) {
-        "#cd4651"
-      },
-      if ("Yes" %in% df[[value]]) {
-        "#44abb6"
-      }
-    )
-    
-    label <- list(
-      if ("No data" %in% df[[value]]) {
-        list(min = 1, max = 1, label = "No data")
-      },
-      if ("No" %in% df[[value]]) {
-        list(min = 2, max = 2, label = "No")
-      },
-      if ("Yes" %in% df[[value]]) {
-        list(min = 3, max = 3, label = "Yes")
-      }
-    )
-    label[sapply(label, is.null)] <- NULL
+    df[, name := get_recoded_countries(name)]
     
     df$value <- df[[value]]
-    df[, value := ifelse(is.na(df$value), "No data", df$value)]
-    df[, value := value_lookup[df$value]]
-    
-    selected_test_cols <- switch (input$slt_category,
-                                  `Molecular Test` = column_choices$`Molecular testing`,
-                                  `Antigen RDT` = setdiff(column_choices$`Antigen testing`, "Any limitations on who can use antigen RDTs"),
-                                  `Antibody RDT` = column_choices$`Antibody testing`,
-                                  `Self Test` = column_choices$`Self testing`
-    )
+    if (input$slt_question %in% testing_cols) {
+      colors <- get_map_colors(df[[value]])
+      label <- get_map_labels(df[[value]])
+      
+      df[, value := ifelse(is.na(df$value), "No data", df$value)]
+      df[, value := value_lookup[df$value]]
+    } else {
+      colors <- get_map_colors(df[[value]], yesno = FALSE)
+      label <- get_map_labels(df[[value]], yesno = FALSE)
+      
+      df[, value := ifelse(df$value %in% c(NA_character_, "", "No data", "No Data"), "No data", "Data available")]
+      df[, value := value_lookup2[df$value]]
+    }
     
     df %>%
       e_charts(name, dispose = FALSE) %>% 
@@ -183,54 +131,28 @@ mod_map_server <- function(input, output, session) {
         
         inRange = list(color = colors), # scale colors
       ) %>%
-      e_theme(theme) %>%
-      e_tooltip(formatter = htmlwidgets::JS(sprintf("
+      #e_theme(theme) %>% 
+      e_tooltip(formatter = htmlwidgets::JS("
         function(params) {
-          console.log(params);
-          var value;
-          
-          if (params.value === 0) {
-            value = 'NA';
-          } else if (params.value === 1) {
-            value = 'No data';
-          } else if (params.value === 2) {
-            value = 'No';
-          } else if (params.value === 3) {
-            value = 'Yes';
-          } else {
-            value = '';
-          };
-          
-          var test_cols = '%s';
+          var test_cols = $('[data-id=\"mod_map-slt_question\"]').attr('title');
           var testcolArray = test_cols.split('|');
           var list = '';
           
           for (i = 0; i < testcolArray.length; i++) {
             var key = testcolArray[i];
             var paramValue = 'No data';
-            
-            if (params.data.hasOwnProperty(key) && params.data[key] !== null) {
+
+            if (params.data !== undefined && params.data.hasOwnProperty(key) && params.data[key] !== null) {
               paramValue = params.data[key];
             }
             list += '<li><b>' + key + '</b>: ' + paramValue + '</li>';
-          } 
+          }
           
-          //var links = (params.data['Policy links']);
-          
-          //'</h4>' + '%s' + '<span style=\"float: right;\">' + '<b>' + value + '</b>' + 
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }
-      ", paste0(selected_test_cols, collapse = "|"), value))#, 
-                # position = JS("function (pos, params, dom, rect, size) {
-                #   // tooltip will be fixed on the right if mouse hovering on the left,
-                #   // and on the left if hovering on the right.
-                #   var obj = {top: 60};
-                #   obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 5;
-                #   return obj;
-                # }"),
-                # backgroundColor = 'rgba(255, 255, 255, 0.6)'
-      )
-  })
+      "))
+  }) %>% 
+    bindCache(input$slt_question, input$i_roam, unname(tools::md5sum("data/Policy_Mapping.xlsx")))
   
   # Event: User clicked on map ----------------------------
   observeEvent(input$map_clicked_data, {
@@ -252,10 +174,10 @@ mod_map_server <- function(input, output, session) {
       df <- df[1, ]
       
       selected_test_cols <- switch (input$slt_category,
-                                    `Molecular Test` = column_choices$`Molecular testing`,
-                                    `Antigen RDT` = column_choices$`Antigen testing`,
-                                    `Antibody RDT` = column_choices$`Antibody testing`,
-                                    `Self Test` = column_choices$`Self testing`
+                                    `Molecular Test` = column_choices$`Molecular Test`,
+                                    `Professional Use Antigen RDT` = column_choices$`Professional Use Antigen RDT`,
+                                    `Antibody RDT` = column_choices$`Antibody RDT`,
+                                    `Self-test Antigen RDT` = column_choices$`Self-test Antigen RDT`
       )
       
       test_list <- tags$ul(
@@ -325,5 +247,29 @@ mod_map_server <- function(input, output, session) {
     req(input$slt_secondary_detail)
     
     rv$selected_on_map <- input$slt_secondary_detail
+  })
+  
+  # Event: Update question picker based on category -------
+  observeEvent(input$slt_category, {
+    req(input$slt_category)
+    
+    choices <- column_choices[[input$slt_category]]
+    selected <- registration_questions[[input$slt_category]]
+    
+    if (input$slt_category == "Molecular Test") {
+      value <- "Molecular test registered in country"
+    } else if (input$slt_category == "Professional Use Antigen RDT") {
+      value <- "Antigen RDTs registered in country"
+    } else if (input$slt_category == "Antibody RDT") {
+      value <- "Antibody RDTs registered in country"
+    } else if (input$slt_category == "Self-test Antigen RDT") {
+      value <- "Self tests registered for use in country"
+    }
+    
+    # Set reactive value
+    rv$value <- value
+    
+    # Update picker
+    updatePickerInput(session = session, inputId = "slt_question", choices = choices, selected = selected)
   })
 }
