@@ -18,21 +18,19 @@ library(sparkline)
 library(r2d3)
 library(openxlsx)
 library(urltools)
+library(cachem)
 
 # Set locale to English for date formatting
 #Sys.setlocale("LC_ALL","English")
 Sys.setlocale("LC_TIME", "C")
 
-material_dep <- htmltools::htmlDependency(
-  name = "material-ui",
-  version = "4.6.1",
-  src = c(href = "https://unpkg.com/@material-ui/core/umd/"),
-  script = "material-ui.production.min.js"
-)
-
 # Read helper functions
 helper_files <- dir("helpers", full.names = TRUE)
 lapply(helper_files, source)
+
+# Read modules
+module_files <- dir("modules", full.names = TRUE)
+lapply(module_files, source)
 
 # World Bank classification ---------------------
 wb_classification <- readxl::read_xls("data/WorldBank Classification.xls", skip = 4)
@@ -42,7 +40,8 @@ wb_classification[, Income := `Income group`]
 wb_classification[, `Income group` := NULL]
 
 # Read dx policy --------------------------------
-dx_policy <- readxl::read_xlsx("data/Policy_Mapping.xlsx")
+policy_file_path <- "data/Policy_Mapping.xlsx"
+dx_policy <- readxl::read_xlsx(policy_file_path)
 setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
 dx_policy[, `Notes` := NULL]
@@ -53,47 +52,70 @@ names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacemen
 # Covid case sensitivity
 names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("covid-19", ignore_case = TRUE), replacement = "COVID-19")
 
+# Rename self-test questions
+names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("Are self[- ]tests?", ignore_case = TRUE), replacement = "Self tests")
+
 # Simplify questions
 setnames(dx_policy,
          old = c(
+           # General
            "Does the country have a policy that guides COVID-19 testing strategy?",
+           "What is the choice of test (i.e PCR or AgRDT) in order of priority?",
+           
+           # Molecular tests
            "Is molecular testing registered for use in country?",
            "Is molecular testing used to confirm a COVID-19 diagnosis?",
+           "What is the policy recommendation for where to use PCR tests?",
+           "Who are the trained operators allowed to administer the PCR test?",
+           
+           # Professional use Antigen
            "Are antigen rapid tests registered for use in country?",
            "Are antigen rapid tests used to confirm COVID-19 diagnosis?",
-           "Are antigen rapid tests used for the testing of symptomatic patients?",
-           "Are antigen rapid tests used for the screening of asymptomatic patients?",
+           "Can antigen rapid tests be used for the testing/screening of symptomatic cases?",
+           "Can antigen rapid tests be used for the testing/screening of asymptomatic populations?",
+           "What is the policy recommendation for where to use AgRDT tests?",
+           "Who are the trained operators allowed to administer the Ag-RDT test?",
 
-           "Are antigen rapid tests used for asymptomatic contacts of known positives (i.e., contact tracing)?",
-           "Are antigen rapid tests used for testing of health care workers / front line staff?",
-           "Are antigen rapid tests used for testing at borders / points of entry?",
-           "Are antigen rapid tests used for testing at schools / workplaces?",
-           "Are antigen rapid tests used for testing for non COVID-19 hospitalized patients (e.g., scheduled or elective surgery)?",
-           "Who is allowed to use the Ag-RDTs (only health workers etc)?",
-
+           # Antibody
            "Are antibody rapid tests registered for use in country?",
            "Are antibody rapid tests used to confirm a COVID-19 diagnosis?",
-           "Are antibody rapid tests used for serosurveillance studies of COVID-19?"
+           "Are antibody rapid tests used for serosurveillance studies of COVID-19?",
+           
+           # Self Tests
+           "Does the country have a policy guiding COVID-19 self-testing?",
+           "Self tests registered for use in country?",
+           "Can self-tests be used in the testing/screening of symptomatic patients?",
+           "Can self-tests used in the testing/screening of asymptomatic populations?"
          ),
          new = c(
+           # General
            "COVID-19 testing strategy available",
+           "Choice of molecular or rapid tests in order of priority",
+           
+           # Molecular tests
            "Molecular test registered in country",
            "Molecular test used to confirm COVID-19 diagnosis",
+           "Policy recommendation on where to use molecular tests",
+           "Trained operators administering molecular tests",
+           
+           # Professional use Antigen
            "Antigen RDTs registered in country",
            "Antigen RDTs used to confirm COVID-19 diagnosis",
-           "Antigen RDTs used for testing symptomatic patients",
-           "Antigen RDTs used for testing asymptomatic patients",
+           "Antigen RDTs used for testing symptomatic cases",
+           "Antigen RDTs used for testing asymptomatic populations",
+           "Policy recommendation on where to use antigen rapid tests",
+           "Trained operators administering antigen rapid tests",
 
-           "Antigen RDTs used for contact tracing",
-           "Antigen RDTs used for healthcare workers",
-           "Antigen RDTs used at borders",
-           "Antigen RDTs used at schools/workplaces",
-           "Antigen RDTs used for non COVID-19 hospitalized patients",
-           "Any limitations on who can use antigen RDTs",
-
+           # Antibody
            "Antibody RDTs registered in country",
            "Antibody RDTs used to confirm COVID-19 diagnosis",
-           "Antibody RDTs used for serosurveillance studies of COVID-19"
+           "Antibody RDTs used for serosurveillance studies of COVID-19",
+           
+           # Self Tests
+           "Does the country have a policy guiding COVID-19 self-testing",
+           "Self tests registered for use in country",
+           "Self tests used in the screening of symptomatic cases",
+           "Self tests used in the screening of asymptomatic populations"
          ))
 
 # Remove extra whitespace from policy links
@@ -178,27 +200,11 @@ default_cols <- c("Country",
                   "Antibody RDTs used for serosurveillance studies of COVID-19",
                   "Antigen RDTs registered in country",
                   "Antigen RDTs used to confirm COVID-19 diagnosis",
-                  "Antigen RDTs used for testing symptomatic patients")
-
-testing_cols <- c("COVID-19 testing strategy available",
-
-                  "Molecular test registered in country",
-                  "Molecular test used to confirm COVID-19 diagnosis",
-
-                  "Antigen RDTs registered in country",
-                  "Antigen RDTs used to confirm COVID-19 diagnosis",
-                  "Antigen RDTs used for testing symptomatic patients",
-                  "Antigen RDTs used for testing asymptomatic patients",
-                  "Antigen RDTs used for contact tracing",
-                  "Antigen RDTs used for healthcare workers",
-                  "Antigen RDTs used at borders",
-                  "Antigen RDTs used at schools/workplaces",
-                  "Antigen RDTs used for non COVID-19 hospitalized patients",
-
-                  "Antibody RDTs registered in country",
-                  "Antibody RDTs used to confirm COVID-19 diagnosis",
-                  "Antibody RDTs used for serosurveillance studies of COVID-19"
-)
+                  "Antigen RDTs used for testing symptomatic cases",
+                  
+                  "Does the country have a policy guiding COVID-19 self-testing",
+                  "Self tests registered for use in country",
+                  "Self tests used in the screening of symptomatic cases")
 
 column_choices <- list(
   General = c(
@@ -207,29 +213,56 @@ column_choices <- list(
     "Income",
     "Date of last update",
     "COVID-19 testing strategy available",
+    "Choice of molecular or rapid tests in order of priority",
     "Policy links"
   ),
-  `Molecular testing` = c(
+  `Molecular Test` = c(
     "Molecular test registered in country",
     "Molecular test used to confirm COVID-19 diagnosis"
   ),
-  `Antibody testing` = c(
+  `Antibody RDT` = c(
     "Antibody RDTs registered in country",
     "Antibody RDTs used to confirm COVID-19 diagnosis",
     "Antibody RDTs used for serosurveillance studies of COVID-19"
   ),
-  `Antigen testing` = c(
+  `Professional Use Antigen RDT` = c(
     "Antigen RDTs registered in country",
     "Antigen RDTs used to confirm COVID-19 diagnosis",
-    "Antigen RDTs used for testing symptomatic patients",
-    "Antigen RDTs used for testing asymptomatic patients",
-    "Antigen RDTs used for contact tracing",
-    "Antigen RDTs used for healthcare workers",
-    "Antigen RDTs used at borders",
-    "Antigen RDTs used at schools/workplaces",
-    "Antigen RDTs used for non COVID-19 hospitalized patients",
-    "Any limitations on who can use antigen RDTs"
+    "Antigen RDTs used for testing symptomatic cases",
+    "Antigen RDTs used for testing asymptomatic populations"
+  ),
+  `Self-test Antigen RDT` = c(
+    "Does the country have a policy guiding COVID-19 self-testing",
+    "Self tests registered for use in country",
+    "Self tests used in the screening of symptomatic cases",
+    "Self tests used in the screening of asymptomatic populations"
   )
+)
+
+testing_cols <- c("COVID-19 testing strategy available",
+                  
+                  "Molecular test registered in country",
+                  "Molecular test used to confirm COVID-19 diagnosis",
+                  
+                  "Antigen RDTs registered in country",
+                  "Antigen RDTs used to confirm COVID-19 diagnosis",
+                  "Antigen RDTs used for testing symptomatic cases",
+                  "Antigen RDTs used for testing asymptomatic populations",
+                  
+                  "Antibody RDTs registered in country",
+                  "Antibody RDTs used to confirm COVID-19 diagnosis",
+                  "Antibody RDTs used for serosurveillance studies of COVID-19",
+                  
+                  "Does the country have a policy guiding COVID-19 self-testing",
+                  "Self tests registered for use in country",
+                  "Self tests used in the screening of symptomatic cases",
+                  "Self tests used in the screening of asymptomatic populations")
+
+registration_questions <- list(
+  `Molecular Test` = "Molecular test registered in country",
+  `Antibody RDT` = "Antibody RDTs registered in country",
+  `Professional Use Antigen RDT` = "Antigen RDTs registered in country",
+  `Self-test Antigen RDT` = "Self tests registered for use in country"
 )
 
 dx_policy[, (testing_cols) := lapply(.SD, function(x) {
@@ -242,19 +275,25 @@ dx_policy[, (testing_cols) := lapply(.SD, function(x) {
 
 setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update",
                          "COVID-19 testing strategy available",
-                         column_choices$`Molecular testing`,
-                         column_choices$`Antigen testing`,
-                         column_choices$`Antibody testing`
+                         column_choices$`Molecular Test`,
+                         column_choices$`Professional Use Antigen RDT`,
+                         column_choices$`Antibody RDT`,
+                         column_choices$`Self-test Antigen RDT`
 ))
 
 # Convert columns to factor/date ----------------
 factor_cols <- public_cols[!public_cols %in% c("Policy links", "Date of last update")]
 dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
-dx_policy[, `Date of last update` := as_date(`Date of last update`)]
+dx_policy[, `Date of last update` := parse_excel_date(`Date of last update`)]
+#dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 
 value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 2, "In the process of registration" = 2, "No" = 2, "Yes" = 3)
+value_lookup2 <- c("NA" = 1, "No data" = 1, "No Data" = 1, "Data available" = 2)
 
 # Map to use
 #' Source: https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json
 #' Modifications: Somaliland merged into Somalia, Northern Cyprus merged into Cyprus
 geojson <- jsonlite::read_json(file.path("map", "countries.geo.json"))
+
+# Store cache persistently
+shinyOptions(cache = cachem::cache_disk(file.path("cache")))
