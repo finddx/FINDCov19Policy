@@ -162,6 +162,7 @@ dx_policy <- merge(
 )
 
 # Add flags -------------------------------------
+dx_policy[Country %in% "Tanzania", "iso2c"] <- "tz"
 dx_policy[, `Flag` := paste0(
   ifelse(!is.na(dx_policy$iso2c), sprintf('<span class="flag-icon flag-icon-%s" style="margin-right: 5px;"></span>', tolower(dx_policy$iso2c)), "")
 )]
