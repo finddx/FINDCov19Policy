@@ -141,6 +141,9 @@ dx_policy[, `Policy links` := str_replace_all(`Policy links`, pattern = "(http(s
 codelist <- setNames(countrycode::codelist[, c("iso2c", "iso3c", "continent", "iso.name.en")], c("iso2c", "iso3c", "Continent", "iso.name.en"))
 codelist <- codelist[!is.na(codelist$iso.name.en), ]
 
+codelist[codelist$iso.name.en %in% "Tanzania, the United Republic of", "iso.name.en"] <- "Tanzania"
+dx_policy[Country %in% "Tanzania", "ISO"] <- "TZA"
+
 dx_policy <- merge(
   x = dx_policy,
   y = codelist,
@@ -162,7 +165,6 @@ dx_policy <- merge(
 )
 
 # Add flags -------------------------------------
-dx_policy[Country %in% "Tanzania", "iso2c"] <- "tz"
 dx_policy[, `Flag` := paste0(
   ifelse(!is.na(dx_policy$iso2c), sprintf('<span class="flag-icon flag-icon-%s" style="margin-right: 5px;"></span>', tolower(dx_policy$iso2c)), "")
 )]
