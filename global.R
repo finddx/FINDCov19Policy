@@ -46,6 +46,14 @@ setDT(dx_policy)
 dx_policy[, `Date of last update` := as.character(`Date of last update`)]
 dx_policy[, `Notes` := NULL]
 
+# TEMP: Remove links
+dx_policy[, `:=`(
+  `Policy Links 17` = NULL,
+  `Policy Links 18` = NULL,
+  `Policy Links 19` = NULL,
+  `Policy Links 20` = NULL
+)]
+
 # Remove extra spaces from colnames
 names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
 
