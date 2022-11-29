@@ -57,6 +57,25 @@ load_html_dependencies <- function() {
         .hvr-underline-from-left:hover:before, .hvr-underline-from-left:focus:before, .hvr-underline-from-left:active:before {
           right: 0;
         }
+        
+        .menu-app {
+          font-weight: 300;
+          font-size: 13px;
+          text-transform: uppercase;
+          color: #000;
+          margin-right: 20px;
+          white-space: nowrap;
+        }
+        
+        .menu-app.active {
+          border-bottom: solid 1px #a9413b;
+          padding-bottom: 2px;
+          transition: all 0.25s ease;
+        }
+        
+        .nav-tabs {
+          border-bottom: none;
+        }
       "),
     
     tags$script(HTML("

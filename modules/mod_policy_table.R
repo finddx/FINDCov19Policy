@@ -1,9 +1,9 @@
-mod_policy_table_ui <- function(id) {
+mod_policy_table_ui <- function(id, title, column_choices, default_cols) {
   ns <- NS(id)
   tagList(
     fluidRow(
       div(class = "col-sm-12",
-          h3(id = "compare", "Diagnostics Policy Table"),
+          h3(title),
           
           p("The table below displays diagnostics policy data:"),
           
@@ -40,18 +40,18 @@ mod_policy_table_ui <- function(id) {
   )
 }
 
-mod_policy_table_server <- function(input, output, session) {
+mod_policy_table_server <- function(input, output, session, data, main_cols, column_choices, add_policy_testing = TRUE) {
   ns <- session$ns
   
   # Reactive: Policy data ---------------------------------
   policy_data <- reactive( {
     req(!is.null(input$cb_show_data))
     
-    df <- dx_policy
+    df <- data
     
     # Filter out na rows if needed
     if (input$cb_show_data) {
-      na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = testing_cols[testing_cols %in% colnames(df)]]
+      na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = main_cols[main_cols %in% colnames(df)]]
       df <- df[na_rows == 0]
     }
     
@@ -69,13 +69,15 @@ mod_policy_table_server <- function(input, output, session) {
     # Select only cols to show
     df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", "Continent", "Income"), with = FALSE]
     
-    policy_testing <- colnames(df)[colnames(df) == "COVID-19 testing strategy available"]
-    molecular_testing <- colnames(df)[colnames(df) %in% column_choices$`Molecular Test`]
-    antigen_testing <- colnames(df)[colnames(df) %in% column_choices$`Professional Use Antigen RDT`]
-    antibody_testing <- colnames(df)[colnames(df) %in% column_choices$`Antibody RDT`]
-    self_testing <- colnames(df)[colnames(df) %in% column_choices$`Self-test Antigen RDT`]
+    testing_cols_list <- lapply(column_choices, function(x) x[x %in% names(df)])[-1]
     
-    testing_cols_list <- list(policy_testing, molecular_testing, antigen_testing, antibody_testing, self_testing)
+    # Add policy testing if needed
+    if (isTRUE(add_policy_testing)) {
+      policy_testing <- colnames(df)[colnames(df) %in% "COVID-19 testing strategy available"]
+      testing_cols_list <- c(`Testing policy` = policy_testing, testing_cols_list)
+    }
+    
+    # Gray columns
     gray_columns <- unlist(testing_cols_list[as.logical(cumsum(
       unlist(lapply(testing_cols_list, length)) > 0
     ) %% 2)])
@@ -107,32 +109,17 @@ mod_policy_table_server <- function(input, output, session) {
     
     # Column group list
     gray_column_groups <- cumsum(
-      unlist(lapply(list(policy_testing, molecular_testing, antigen_testing, antibody_testing, self_testing), length)) > 0
+      unlist(lapply(testing_cols_list, length)) > 0
     ) %% 2
     
-    columnGroups_list <- list(
-      if (length(policy_testing) > 0) {
-        colGroup(name = "Testing policy", columns = policy_testing, 
-                 headerStyle = if (gray_column_groups[1]) list(`background-color` = "#f7f7f7"))
-      },
-      if (length(molecular_testing) > 0) {
-        colGroup(name = "Molecular Test", columns = molecular_testing,
-                 headerStyle = if (gray_column_groups[2]) list(`background-color` = "#f7f7f7"))
-      },
-      if (length(antibody_testing) > 0) {
-        colGroup(name = "Antibody RDTs", columns = antibody_testing,
-                 headerStyle = if (gray_column_groups[4]) list(`background-color` = "#f7f7f7"))
-      },
-      if (length(antigen_testing) > 0) {
-        colGroup(name = "Professional Use Antigen RDT", columns = antigen_testing,
-                 headerStyle = if (gray_column_groups[3]) list(`background-color` = "#f7f7f7"))
-      },
-      if (length(self_testing) > 0) {
-        colGroup(name = "Self-test Antigen RDT", columns = self_testing,
-                 headerStyle = if (gray_column_groups[5]) list(`background-color` = "#f7f7f7"))
+    columnGroups_list <- mapply(testing_cols_list, gray_column_groups, names(testing_cols_list),
+                                SIMPLIFY = FALSE, USE.NAMES = FALSE, 
+                                FUN = function(elem, grp, nm) {
+      if (length(elem) > 0) {
+        colGroup(name = nm, columns = elem, 
+                 headerStyle = if (grp) list(`background-color` = "#f7f7f7"))
       }
-    )
-    
+    })
     columnGroups_list[sapply(columnGroups_list, is.null)] <- NULL
     
     out <- reactable(df,
@@ -166,7 +153,7 @@ mod_policy_table_server <- function(input, output, session) {
                      columnGroups = columnGroups_list
     )
     
-    range_filter_cols <- c("Continent", "Income", "COVID-19 testing strategy available", testing_cols)
+    range_filter_cols <- c("Continent", "Income", "COVID-19 testing strategy available", unlist(column_choices[-1], use.names = FALSE))
     
     #filter_cols <- which(colnames(df) %in% testing_cols)
     columns_name <- sapply(out$x$tag$attribs$columns, `[[`, "name")
@@ -185,14 +172,14 @@ mod_policy_table_server <- function(input, output, session) {
   # Event: Download selected rows -------------------------
   output$lnk_download_selected <- downloadHandler(
     filename = function() {
-      paste('data-', Sys.Date(), '.csv', sep='')
+      paste('data-', Sys.Date(), '.csv', sep = '')
     },
     content = function(file) {
       req(policy_data())
       df <- copy(policy_data())
     
       # Country
-      df <- df[, colnames(dx_policy) %in% input$cb_selected_cols, with = FALSE]
+      df <- df[, colnames(df) %in% input$cb_selected_cols, with = FALSE]
       if (length(selected() > 0L)) {
         df <- df[selected()]
       }
@@ -204,10 +191,14 @@ mod_policy_table_server <- function(input, output, session) {
   # Event: Download raw data ------------------------------
   output$lnk_download_raw <- downloadHandler(
     filename = function() {
-      paste('raw_data-', Sys.Date(), '.xlsx', sep='')
+      paste('raw_data-', Sys.Date(), '.xlsx', sep = '')
     },
     content = function(file) {
-      file.copy(from = policy_file_path, to = file)
+      if (isTRUE(add_policy_testing)) {
+        file.copy(from = file.path(content_path, "dx_policy.xlsx"), to = file)
+      } else {
+        file.copy(from = file.path(content_path, "tx_policy.xlsx"), to = file)
+      }
     }
   )
   

@@ -19,6 +19,7 @@ library(r2d3)
 library(openxlsx)
 library(urltools)
 library(cachem)
+library(writexl)
 
 # Set locale to English for date formatting
 #Sys.setlocale("LC_ALL","English")
@@ -33,156 +34,40 @@ module_files <- dir("modules", full.names = TRUE)
 lapply(module_files, source)
 
 # World Bank classification ---------------------
-wb_classification <- readxl::read_xls("data/WorldBank Classification.xls", skip = 4)
-setDT(wb_classification)
-wb_classification <- wb_classification[!is.na(`Income group`) & `Income group` != "x", .(Code, `Income group`)]
-wb_classification[, Income := `Income group`]
-wb_classification[, `Income group` := NULL]
+wb_classification <- read_world_bank_classification()
 
 # Read dx policy --------------------------------
 policy_file_path <- "data/Policy_Mapping.xlsx"
-dx_policy <- readxl::read_xlsx(policy_file_path)
-setDT(dx_policy)
-dx_policy[, `Date of last update` := as.character(`Date of last update`)]
-dx_policy[, `Notes` := NULL]
+dx_policy <- read_dx_policy(policy_file_path)
 
-# TEMP: Remove links
-dx_policy[, `:=`(
-  `Policy Links 17` = NULL,
-  `Policy Links 18` = NULL,
-  `Policy Links 19` = NULL,
-  `Policy Links 20` = NULL
-)]
-
-# Remove extra spaces from colnames
-names(dx_policy) <- str_replace_all(names(dx_policy), pattern = " +", replacement = " ")
-
-# Covid case sensitivity
-names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("covid-19", ignore_case = TRUE), replacement = "COVID-19")
-
-# Rename self-test questions
-names(dx_policy) <- str_replace_all(names(dx_policy), pattern = regex("Are self[- ]tests?", ignore_case = TRUE), replacement = "Self tests")
-
-# Simplify questions
-setnames(dx_policy,
-         old = c(
-           # General
-           "Does the country have a policy that guides COVID-19 testing strategy?",
-           "What is the choice of test (i.e PCR or AgRDT) in order of priority?",
-           
-           # Molecular tests
-           "Is molecular testing registered for use in country?",
-           "Is molecular testing used to confirm a COVID-19 diagnosis?",
-           "What is the policy recommendation for where to use PCR tests?",
-           "Who are the trained operators allowed to administer the PCR test?",
-           
-           # Professional use Antigen
-           "Are antigen rapid tests registered for use in country?",
-           "Are antigen rapid tests used to confirm COVID-19 diagnosis?",
-           "Can antigen rapid tests be used for the testing/screening of symptomatic cases?",
-           "Can antigen rapid tests be used for the testing/screening of asymptomatic populations?",
-           "What is the policy recommendation for where to use AgRDT tests?",
-           "Who are the trained operators allowed to administer the Ag-RDT test?",
-
-           # Antibody
-           "Are antibody rapid tests registered for use in country?",
-           "Are antibody rapid tests used to confirm a COVID-19 diagnosis?",
-           "Are antibody rapid tests used for serosurveillance studies of COVID-19?",
-           
-           # Self Tests
-           "Does the country have a policy guiding COVID-19 self-testing?",
-           "Self tests registered for use in country?",
-           "Can self-tests be used in the testing/screening of symptomatic patients?",
-           "Can self-tests used in the testing/screening of asymptomatic populations?"
-         ),
-         new = c(
-           # General
-           "COVID-19 testing strategy available",
-           "Choice of molecular or rapid tests in order of priority",
-           
-           # Molecular tests
-           "Molecular test registered in country",
-           "Molecular test used to confirm COVID-19 diagnosis",
-           "Policy recommendation on where to use molecular tests",
-           "Trained operators administering molecular tests",
-           
-           # Professional use Antigen
-           "Antigen RDTs registered in country",
-           "Antigen RDTs used to confirm COVID-19 diagnosis",
-           "Antigen RDTs used for testing symptomatic cases",
-           "Antigen RDTs used for testing asymptomatic populations",
-           "Policy recommendation on where to use antigen rapid tests",
-           "Trained operators administering antigen rapid tests",
-
-           # Antibody
-           "Antibody RDTs registered in country",
-           "Antibody RDTs used to confirm COVID-19 diagnosis",
-           "Antibody RDTs used for serosurveillance studies of COVID-19",
-           
-           # Self Tests
-           "Does the country have a policy guiding COVID-19 self-testing",
-           "Self tests registered for use in country",
-           "Self tests used in the screening of symptomatic cases",
-           "Self tests used in the screening of asymptomatic populations"
-         ))
-
-# Remove extra whitespace from policy links
-policy_links_cols <- str_subset(names(dx_policy), pattern = "^Policy Links [0-9]+")
-dx_policy[, (policy_links_cols) := lapply(.SD, str_remove_all, pattern = "\\r\\n"), .SDcols = policy_links_cols]
-
-# Remove invalid links
-dx_policy[, (policy_links_cols) := lapply(.SD, function(x) ifelse(is_valid_url(x), x, NA_character_)), .SDcols = policy_links_cols]
-
-# Keep only the link part
-dx_policy[, (policy_links_cols) := lapply(.SD, get_url), .SDcols = policy_links_cols]
-
-# Turn policy links into links ------------------
-setnames(dx_policy, "Policy Links", "Policy links")
-
-## Use <br> for linebreaks
-# dx_policy[, `Policy links` := str_remove_all(`Policy links`, pattern = "<br>NA")]
-#dx_policy[, `Policy links` := str_remove_all(`Policy links`, pattern = "\\n")]
-dx_policy[, `Policy links` := str_replace_all(`Policy links`, pattern = "(\\r)*\\n", replacement = "<br>")]
-dx_policy[, `Policy links` := str_replace_all(`Policy links`, pattern = "(http(s)?://[^<]+)", replacement = "<a href='\\1'>\\1</a>")]
-
-# Merge continent -------------------------------
-codelist <- setNames(countrycode::codelist[, c("iso2c", "iso3c", "continent", "iso.name.en")], c("iso2c", "iso3c", "Continent", "iso.name.en"))
-codelist <- codelist[!is.na(codelist$iso.name.en), ]
-
-codelist[codelist$iso.name.en %in% "Tanzania, the United Republic of", "iso.name.en"] <- "Tanzania"
-dx_policy[Country %in% "Tanzania", "ISO"] <- "TZA"
-
-dx_policy <- merge(
-  x = dx_policy,
-  y = codelist,
-  by.x = "ISO",
-  by.y = "iso3c",
-  all.x = TRUE,
-  all.y = TRUE
+# Split dataset ---------------------------------
+tx_only_cols <- c(
+  "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+  "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
+  "Included in ACT-A partner access agreement for Molnupiravir?",
+  "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?",
+  "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20"
 )
+common_cols <- c("Flag", "Country", "ISO", "Region", "Date of last update", "iso2c")
+tx_cols <- c(common_cols, tx_only_cols)
 
-dx_policy[, Country := ifelse(is.na(Country), iso.name.en, Country)]
-dx_policy[, iso.name.en := NULL]
+tx_policy <- dx_policy[, ..tx_cols]
 
-dx_policy <- merge(
-  x = dx_policy,
-  y = wb_classification,
-  by.x = "ISO",
-  by.y = "Code",
-  all.x = TRUE
-)
+# Split xlsx ------------------------------------
+content_path <- "content"
+if (!dir.exists(content_path)) {
+  dir.create(content_path)
+}
 
-# Add flags -------------------------------------
-dx_policy[, `Flag` := paste0(
-  ifelse(!is.na(dx_policy$iso2c), sprintf('<span class="flag-icon flag-icon-%s" style="margin-right: 5px;"></span>', tolower(dx_policy$iso2c)), "")
-)]
+writexl::write_xlsx(x = dx_policy[, -1], path = file.path(content_path, "dx_policy.xlsx"))
+writexl::write_xlsx(x = tx_policy[, -1], path = file.path(content_path, "tx_policy.xlsx"))
 
-# Add selection checkbox column -----------------
-# select_colname <- shinyInput(checkboxInput, id = 'select_all', value = TRUE)
-# dx_policy[, (select_colname) := shinyInput(checkboxInput, nrow(dx_policy), 'tbl_selection_', value = TRUE)]
-setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update"))
+# Data map
+dx_data_map <- copy(dx_policy)
+tx_data_map <- copy(tx_policy)
 
-data_map <- copy(dx_policy)
+dx_cols <- names(dx_policy)[!names(dx_policy) %in% tx_only_cols]
+dx_policy <- dx_policy[, ..dx_cols]
 
 # Remove unnecessary columns --------------------
 dx_policy[, `:=`(
@@ -191,33 +76,35 @@ dx_policy[, `:=`(
   Region = NULL
 )]
 
-# # Determine long cols ---------------------------
-# col_char_no <- unlist(lapply(dx_policy, function(x) {
-#   max(nchar(x), na.rm = TRUE)
-# }))
-# long_cols <- col_char_no[col_char_no > 500]
-
 # Global variables ------------------------------
 public_cols <- setdiff(colnames(dx_policy), c("Flag"))
 
-default_cols <- c("Country",
-                  "Continent",
-                  "Income",
-                  "COVID-19 testing strategy available",
-                  "Molecular test registered in country",
-                  "Molecular test used to confirm COVID-19 diagnosis",
-                  "Antibody RDTs registered in country",
-                  "Antibody RDTs used to confirm COVID-19 diagnosis",
-                  "Antibody RDTs used for serosurveillance studies of COVID-19",
-                  "Antigen RDTs registered in country",
-                  "Antigen RDTs used to confirm COVID-19 diagnosis",
-                  "Antigen RDTs used for testing symptomatic cases",
-                  
-                  "Does the country have a policy guiding COVID-19 self-testing",
-                  "Self tests registered for use in country",
-                  "Self tests used in the screening of symptomatic cases")
+dx_default_cols <- c("Country",
+                     "Continent",
+                     "Income",
+                     "COVID-19 testing strategy available",
+                     "Molecular test registered in country",
+                     "Molecular test used to confirm COVID-19 diagnosis",
+                     "Antibody RDTs registered in country",
+                     "Antibody RDTs used to confirm COVID-19 diagnosis",
+                     "Antibody RDTs used for serosurveillance studies of COVID-19",
+                     "Antigen RDTs registered in country",
+                     "Antigen RDTs used to confirm COVID-19 diagnosis",
+                     "Antigen RDTs used for testing symptomatic cases",
+                     
+                     "Does the country have a policy guiding COVID-19 self-testing",
+                     "Self tests registered for use in country",
+                     "Self tests used in the screening of symptomatic cases")
 
-column_choices <- list(
+tx_default_cols <- c("Country",
+                     "Continent",
+                     "Income",
+                     "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+                     "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
+                     "Included in ACT-A partner access agreement for Molnupiravir?",
+                     "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?")
+
+dx_column_choices <- list(
   General = c(
     "Country",
     "Continent",
@@ -250,46 +137,82 @@ column_choices <- list(
   )
 )
 
-testing_cols <- c("COVID-19 testing strategy available",
-                  
-                  "Molecular test registered in country",
-                  "Molecular test used to confirm COVID-19 diagnosis",
-                  
-                  "Antigen RDTs registered in country",
-                  "Antigen RDTs used to confirm COVID-19 diagnosis",
-                  "Antigen RDTs used for testing symptomatic cases",
-                  "Antigen RDTs used for testing asymptomatic populations",
-                  
-                  "Antibody RDTs registered in country",
-                  "Antibody RDTs used to confirm COVID-19 diagnosis",
-                  "Antibody RDTs used for serosurveillance studies of COVID-19",
-                  
-                  "Does the country have a policy guiding COVID-19 self-testing",
-                  "Self tests registered for use in country",
-                  "Self tests used in the screening of symptomatic cases",
-                  "Self tests used in the screening of asymptomatic populations")
+# TEMP
+column_choices <- dx_column_choices
 
-registration_questions <- list(
+tx_column_choices <- list(
+  General = c(
+    "Country",
+    "Continent",
+    "Income",
+    "Date of last update",
+    "COVID-19 testing strategy available",
+    "Choice of molecular or rapid tests in order of priority",
+    "Policy links"
+  ),
+  `Molnupiravir` = c(
+    "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+    "Included in ACT-A partner access agreement for Molnupiravir?"
+    
+  ),
+  `Nirmatrelvir/Ritonavir` = c(
+    "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
+    "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"
+  )
+)
+
+dx_testing_cols <- c("COVID-19 testing strategy available",
+                  
+                     "Molecular test registered in country",
+                     "Molecular test used to confirm COVID-19 diagnosis",
+                     
+                     "Antigen RDTs registered in country",
+                     "Antigen RDTs used to confirm COVID-19 diagnosis",
+                     "Antigen RDTs used for testing symptomatic cases",
+                     "Antigen RDTs used for testing asymptomatic populations",
+                     
+                     "Antibody RDTs registered in country",
+                     "Antibody RDTs used to confirm COVID-19 diagnosis",
+                     "Antibody RDTs used for serosurveillance studies of COVID-19",
+                     
+                     "Does the country have a policy guiding COVID-19 self-testing",
+                     "Self tests registered for use in country",
+                     "Self tests used in the screening of symptomatic cases",
+                     "Self tests used in the screening of asymptomatic populations")
+
+tx_treatment_cols <- c(
+  "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+  "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
+  "Included in ACT-A partner access agreement for Molnupiravir?",
+  "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"         
+)
+
+dx_questions_lkp <- list(
   `Molecular Test` = "Molecular test registered in country",
   `Antibody RDT` = "Antibody RDTs registered in country",
   `Professional Use Antigen RDT` = "Antigen RDTs registered in country",
   `Self-test Antigen RDT` = "Self tests registered for use in country"
 )
 
-dx_policy[, (testing_cols) := lapply(.SD, function(x) {
-  ifelse(x == "No Data", "No data", x)
-}), .SDcols = testing_cols]
+tx_questions_lkp <- list(
+  `Molnupiravir` = "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+  `Nirmatrelvir/Ritonavir` = "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?"
+)
 
-dx_policy[, (testing_cols) := lapply(.SD, function(x) {
+dx_policy[, (dx_testing_cols) := lapply(.SD, function(x) {
+  ifelse(x == "No Data", "No data", x)
+}), .SDcols = dx_testing_cols]
+
+dx_policy[, (dx_testing_cols) := lapply(.SD, function(x) {
   ifelse(x == "yes", "Yes", x)
-}), .SDcols = testing_cols]
+}), .SDcols = dx_testing_cols]
 
 setcolorder(dx_policy, c("Flag", "Country", "Continent", "Income", "Date of last update",
                          "COVID-19 testing strategy available",
-                         column_choices$`Molecular Test`,
-                         column_choices$`Professional Use Antigen RDT`,
-                         column_choices$`Antibody RDT`,
-                         column_choices$`Self-test Antigen RDT`
+                         dx_column_choices$`Molecular Test`,
+                         dx_column_choices$`Professional Use Antigen RDT`,
+                         dx_column_choices$`Antibody RDT`,
+                         dx_column_choices$`Self-test Antigen RDT`
 ))
 
 # Convert columns to factor/date ----------------

@@ -1,9 +1,9 @@
-mod_map_ui <- function(id) {
+mod_map_ui <- function(id, title, categories, category_help_text) {
   ns <- NS(id)
   tagList(
     fluidRow(
       column(width = 12,
-             h3(id = "world-view", class = "mt-0 pt-0", "Tests used and registered in the countries")
+             h3(id = "world-view", class = "mt-0 pt-0", title)
       )
     ),
     
@@ -13,7 +13,7 @@ mod_map_ui <- function(id) {
                       prettyRadioButtons(
                         inputId = ns("slt_category"),
                         label = NULL,
-                        choices = c("Molecular Test", "Antibody RDT", "Professional Use Antigen RDT", "Self-test Antigen RDT"),
+                        choices = categories,
                         status = "default",
                         inline = TRUE
                       ),
@@ -22,7 +22,7 @@ mod_map_ui <- function(id) {
                         icon("info-circle"),
                         tags$div(
                           class = "info-mark-text",
-                          tags$p('Please select to display whether Molecular/Antigen/Antibody testing is registered for use in countries')
+                          tags$p(category_help_text)
                         )
                       )
              ),
@@ -43,9 +43,7 @@ mod_map_ui <- function(id) {
                         )
                       )
              ),
-             
              echarts4rOutput(ns("map"), height = "450px"),
-             
              tags$div(class = "info-container", style = "margin-top: -50px;",
                       prettySwitch(
                         inputId = ns("i_roam"),
@@ -77,21 +75,18 @@ mod_map_ui <- function(id) {
   )
 }
 
-mod_map_server <- function(input, output, session) {
+mod_map_server <- function(input, output, session, column_choices, questions_lkp, main_cols, data_map) {
   ns <- session$ns
   
   # Reactive values ---------------------------------------
-  rv <- reactiveValues(selected_on_map = NULL, value = NULL)
+  rv <- reactiveValues(selected_on_map = NULL)
   
   # Render Map --------------------------------------------
   output$map <- renderEcharts4r( {
     req(input$slt_question)
-    
     value <- input$slt_question
-    theme <- "grey"
     
     df <- copy(data_map)
-    #df <- df[Country != "Kosovo"]
     df <- e_country_names(df, iso2c, name)
     df[Country == "Kosovo", name := "Kosovo"]
     
@@ -99,7 +94,7 @@ mod_map_server <- function(input, output, session) {
     df[, name := get_recoded_countries(name)]
     
     df$value <- df[[value]]
-    if (input$slt_question %in% testing_cols) {
+    if (value %in% main_cols) {
       colors <- get_map_colors(df[[value]])
       label <- get_map_labels(df[[value]])
       
@@ -113,14 +108,13 @@ mod_map_server <- function(input, output, session) {
       df[, value := value_lookup2[df$value]]
     }
     
+    # Question selector ID for tooltip
+    selector_id <- ns("slt_question")
+    
     df %>%
       e_charts(name, dispose = FALSE) %>% 
       e_map_register("WORLD", geojson) %>% 
       e_map(map = "WORLD", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10), data = purrr::transpose(df)) %>% 
-      # e_map_("value", roam = input$i_roam, bind = "updated", zoom = 1.20, center = c(0, 10),
-      #        #selectedMode = "multiple",
-      #        data = purrr::transpose(df)
-      # ) %>%
       e_visual_map_(
         "value",
         type = "piecewise",
@@ -128,13 +122,11 @@ mod_map_server <- function(input, output, session) {
         left = "0%",
         calculable = FALSE,
         pieces = label,
-        
         inRange = list(color = colors), # scale colors
       ) %>%
-      #e_theme(theme) %>% 
-      e_tooltip(formatter = htmlwidgets::JS("
+      e_tooltip(formatter = htmlwidgets::JS(sprintf("
         function(params) {
-          var test_cols = $('[data-id=\"mod_map-slt_question\"]').attr('title');
+          var test_cols = $('[data-id=\"%s\"]').attr('title');
           var testcolArray = test_cols.split('|');
           var list = '';
           
@@ -150,7 +142,7 @@ mod_map_server <- function(input, output, session) {
           
           return(params.name + '</span>' + '<br>' + '<span>' + '<ul>' + list + '</ul>' + '</span>')
         }
-      "))
+      ", selector_id)))
   }) %>% 
     bindCache(input$slt_question, input$i_roam, unname(tools::md5sum("data/Policy_Mapping.xlsx")))
   
@@ -162,24 +154,18 @@ mod_map_server <- function(input, output, session) {
   # Render country detail ---------------------------------
   output$ui_country_detail <- renderUI( {
     df_full <- copy(data_map)
-    #df_full <- df_full[Country != "Kosovo"]
     df_full <- e_country_names(df_full, iso2c, name)
-    
+
     if (!is.null(rv$selected_on_map)) {
       # Get ISO code based on name
       #iso_code <- countrycode::countryname(rv$selected_on_map, destination = "iso2c")
-      
+
       # Filter based on ISO
       df <- df_full[iso2c == rv$selected_on_map, ]
       df <- df[1, ]
       
-      selected_test_cols <- switch (input$slt_category,
-                                    `Molecular Test` = column_choices$`Molecular Test`,
-                                    `Professional Use Antigen RDT` = column_choices$`Professional Use Antigen RDT`,
-                                    `Antibody RDT` = column_choices$`Antibody RDT`,
-                                    `Self-test Antigen RDT` = column_choices$`Self-test Antigen RDT`
-      )
-      
+      selected_test_cols <- column_choices[[input$slt_category]]
+
       test_list <- tags$ul(
         tagList(
           lapply(selected_test_cols, function(x) {
@@ -187,24 +173,24 @@ mod_map_server <- function(input, output, session) {
           })
         )
       )
-      
+
       # Gather policy links
       policy_links_cols <- str_subset(names(df), pattern = "^Policy Links [0-9]+")
       links_list <- lapply(policy_links_cols, function(x) {
         df[[x]]
       })
-      
+
       links_list[sapply(links_list, is.na)] <- NULL
-      
+
       button_list <- div(lapply(seq_along(links_list), function(i) {
-        lnk <- str_remove_all(domain(links_list[[i]]), pattern = "^www\\.") 
-        tags$a(h4(lnk, class = "btn btn-default action-button hvr-underline-from-left", 
+        lnk <- str_remove_all(domain(links_list[[i]]), pattern = "^www\\.")
+        tags$a(h4(lnk, class = "btn btn-default action-button hvr-underline-from-left",
                   style = "background-color: #72a6b8; color:white;"), target = "_blank",
                href = links_list[[i]])
       }))
-      
+
       names_df <- na.omit(df_full[order(name), .(name, iso2c)])
-      
+
       div(style = "background-color: #4991a3; color: white; padding: 20px;", class = "container",
           div(class = "row",
               div(class = "col-sm-6",
@@ -254,20 +240,7 @@ mod_map_server <- function(input, output, session) {
     req(input$slt_category)
     
     choices <- column_choices[[input$slt_category]]
-    selected <- registration_questions[[input$slt_category]]
-    
-    if (input$slt_category == "Molecular Test") {
-      value <- "Molecular test registered in country"
-    } else if (input$slt_category == "Professional Use Antigen RDT") {
-      value <- "Antigen RDTs registered in country"
-    } else if (input$slt_category == "Antibody RDT") {
-      value <- "Antibody RDTs registered in country"
-    } else if (input$slt_category == "Self-test Antigen RDT") {
-      value <- "Self tests registered for use in country"
-    }
-    
-    # Set reactive value
-    rv$value <- value
+    selected <- questions_lkp[[input$slt_category]]
     
     # Update picker
     updatePickerInput(session = session, inputId = "slt_question", choices = choices, selected = selected)
