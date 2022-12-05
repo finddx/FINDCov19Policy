@@ -7,8 +7,11 @@ get_map_colors <- function(x, yesno = TRUE) {
       if ("No" %in% x) {
         "#cd4651"
       },
-      if ("Yes" %in% x) {
+      if (any(c("Yes", "Yes (Access price)") %in% x)) {
         "#44abb6"
+      },
+      if (any(c("Yes (public sector only)", "Yes (Tiered price)") %in% x)) {
+        "#9a60b4"
       }
     )
   } else {
@@ -32,7 +35,14 @@ get_map_labels <- function(x, yesno = TRUE) {
       if ("No" %in% x) {
         list(min = 2, max = 2, label = "No")
       },
-      if ("Yes" %in% x) {
+      if ("Yes (public sector only)" %in% x) {
+        list(min = 4, max = 4, label = "Yes (public sector only)")
+      } else if ("Yes (Tiered price)" %in% x) {
+        list(min = 4, max = 4, label = "Yes (Tiered price)")
+      },
+      if ("Yes (Access price)" %in% x) {
+        list(min = 3, max = 3, label = "Yes (Access price)")
+      } else if ("Yes" %in% x) {
         list(min = 3, max = 3, label = "Yes")
       }
     )

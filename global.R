@@ -42,16 +42,23 @@ dx_policy <- read_dx_policy(policy_file_path)
 
 # Split dataset ---------------------------------
 tx_only_cols <- c(
-  "Covered in MPP voluntary licence territory for Molnupiravir generics?",
   "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-  "Included in ACT-A partner access agreement for Molnupiravir?",
+  "Covered in MPP voluntary licence territory for Molnupiravir generics?",
   "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?",
+  "Included in ACT-A partner access agreement for Molnupiravir?",
   "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20"
 )
-common_cols <- c("Flag", "Country", "ISO", "Region", "Date of last update", "iso2c")
+common_cols <- c("Flag", "Country", "Continent", "Income", "ISO", "Region", "Date of last update", "iso2c")
 tx_cols <- c(common_cols, tx_only_cols)
 
 tx_policy <- dx_policy[, ..tx_cols]
+
+# N/A to "No data"
+therapeutics_cols <- c("Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
+                       "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+                       "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?",
+                       "Included in ACT-A partner access agreement for Molnupiravir?")
+tx_policy[, (therapeutics_cols) := lapply(.SD, function(x) ifelse(x %in% "N/A", "No data", x)), .SDcols = therapeutics_cols]
 
 # Split xlsx ------------------------------------
 content_path <- "content"
@@ -146,18 +153,15 @@ tx_column_choices <- list(
     "Continent",
     "Income",
     "Date of last update",
-    "COVID-19 testing strategy available",
-    "Choice of molecular or rapid tests in order of priority",
     "Policy links"
-  ),
-  `Molnupiravir` = c(
-    "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-    "Included in ACT-A partner access agreement for Molnupiravir?"
-    
   ),
   `Nirmatrelvir/Ritonavir` = c(
     "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
     "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"
+  ),
+  `Molnupiravir` = c(
+    "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+    "Included in ACT-A partner access agreement for Molnupiravir?"
   )
 )
 
@@ -221,7 +225,8 @@ dx_policy[, (factor_cols) := lapply(.SD, as.factor), .SDcols = factor_cols]
 dx_policy[, `Date of last update` := parse_excel_date(`Date of last update`)]
 #dx_policy[, `Date of last update` := as_date(`Date of last update`)]
 
-value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 2, "In the process of registration" = 2, "No" = 2, "Yes" = 3)
+value_lookup <- c("NA" = 1, "No data" = 1, "No Data" = 1, "No, but used" = 2, "In the process of registration" = 2, "No" = 2, "Yes" = 3,
+                  "Yes (public sector only)" = 4, "Yes (Access price)" = 3, "Yes (Tiered price)" = 4)
 value_lookup2 <- c("NA" = 1, "No data" = 1, "No Data" = 1, "Data available" = 2)
 
 # Map to use

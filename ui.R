@@ -1,7 +1,7 @@
 banner <- HTML('
   <section class="hero"><span class="gradient"></span>
       <div class="content">
-          <h2 class="subtitle underline">COVID-19 Diagnostics and Therapeutics Policy Mapping Dashboard</h2>
+          <h2 class="subtitle underline">COVID-19 Diagnostics Policy and Therapeutics Access Dashboard</h2>
       </div>
   </section>
 ')
@@ -13,7 +13,7 @@ tabset_panel <- shiny::tabsetPanel(id = "id",
       tags$div(class = "col-md-12", style = "margin: 0 -1.75rem;",
         tags$div(class = "card ",
           tags$div(class = "card-body",
-            section_about(),
+            dx_section_about(),
             mod_map_ui(id = "mod_map_diagnostic", 
                        title = "Tests used and registered in the countries",
                        categories = c("Molecular Test", "Antibody RDT", "Professional Use Antigen RDT", "Self-test Antigen RDT"),
@@ -31,12 +31,12 @@ tabset_panel <- shiny::tabsetPanel(id = "id",
       tags$div(class = "col-md-12", style = "margin: 0 -1.75rem;",
         tags$div(class = "card ",
           tags$div(class = "card-body",
-            section_about(),
+            tx_section_about(),
             mod_map_ui(id = "mod_map_treatment",
                        title = "Therapeutics available in the countries",
                        categories = c("Molnupiravir", "Nirmatrelvir/Ritonavir"),
-                       category_help_text = "Please select to display whether Molnupiravir or Nirmatrelvir/Ritonavir treatement is available in countries"),
-            mod_policy_table_ui(id = "mod_table_treatment", title = "Treatment Policy Table",
+                       category_help_text = "Please select to display if countries are eligible to access nirmatrelvir/ritonavir or molnupiravir from ACT-A partners and/or are included in MPP’s Voluntary License territory"),
+            mod_policy_table_ui(id = "mod_table_treatment", title = "Treatment Access Table",
                                 column_choices = tx_column_choices, default_cols = tx_default_cols),
             section_contact()
           )
@@ -68,7 +68,7 @@ tablerDashPage(
   navbar = tags$div(
     banner
   ),
-  footer = tablerDashFooter(tagList("COVID-19 Diagnostics and Therapeutics Policy Mapping Dashboard"), copyrights = "Copyright FIND"),
+  footer = tablerDashFooter(tagList("COVID-19 Diagnostics Policy and Therapeutics Access Dashboard"), copyrights = "Copyright FIND"),
   title = "Country testing policies",
   body = tablerDashBody(
     # HTML / CSS / JS dependencies

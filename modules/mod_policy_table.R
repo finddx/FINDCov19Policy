@@ -67,7 +67,7 @@ mod_policy_table_server <- function(input, output, session, data, main_cols, col
     df <- copy(policy_data())
     
     # Select only cols to show
-    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country", "Continent", "Income"), with = FALSE]
+    df <- df[, colnames(df) %in% c(input$cb_selected_cols, "Flag", "Country"), with = FALSE]
     
     testing_cols_list <- lapply(column_choices, function(x) x[x %in% names(df)])[-1]
     
