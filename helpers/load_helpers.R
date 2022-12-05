@@ -7,6 +7,27 @@ read_world_bank_classification <- function() {
   wb_classification
 }
 
+read_tx_policy <- function(file_path) {
+  tx_policy <- readxl::read_xlsx(file_path, skip = 4)
+  setDT(tx_policy)
+  names(tx_policy) <- c(
+    "Country",
+    "ISO",
+    "World Bank Classification",
+    "Region",
+    "Covered in MPP voluntary licence territory for Molnupiravir generics?",
+    "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
+    "Included in ACT-A partner access agreement for Molnupiravir?",
+    "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"
+  )
+  
+  tx_policy$`World Bank Classification` <- NULL
+  tx_policy$`Region` <- NULL
+  tx_policy$`Country` <- NULL
+  
+  tx_policy
+}
+
 read_dx_policy <- function(file_path) {
   dx_policy <- readxl::read_xlsx(file_path)
   setDT(dx_policy)

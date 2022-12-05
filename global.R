@@ -49,9 +49,12 @@ tx_only_cols <- c(
   "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20"
 )
 common_cols <- c("Flag", "Country", "Continent", "Income", "ISO", "Region", "Date of last update", "iso2c")
+merge_cols <- c(common_cols, "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20")
 tx_cols <- c(common_cols, tx_only_cols)
 
-tx_policy <- dx_policy[, ..tx_cols]
+tx_policy <- read_tx_policy("data/Therapeutics.xlsx")
+tx_policy <- merge(x = tx_policy, y = dx_policy[, ..merge_cols], by = "ISO")
+setcolorder(tx_policy, tx_cols)
 
 # N/A to "No data"
 therapeutics_cols <- c("Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
