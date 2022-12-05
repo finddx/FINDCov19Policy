@@ -35,7 +35,7 @@ tx_section_about <- function() {
            tags$ol(
              tags$li(paste0("The countries that have access to generic versions via the voluntary license territories of the ",
                             "Medicines Patent Pool's (MPP's) license agreements")),
-             tags$li("The countries that have access to originator product via ACT-A partner (Global Fund and/or Unicef) procurement platforms")
+             tags$li("The countries that have access to originator products via ACT-A partner (Global Fund and/or Unicef) procurement platforms")
            ),
            p(
              paste0("Please note that countries that are not included in the voluntary license territory may still be able to ",

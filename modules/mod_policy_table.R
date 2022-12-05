@@ -5,7 +5,7 @@ mod_policy_table_ui <- function(id, title, column_choices, default_cols) {
       div(class = "col-sm-12",
           h3(title),
           
-          p("The table below displays diagnostics policy data:"),
+          p("The table below displays therapeutics access data:"),
           
           tags$div(class = "info-container", style = "display: flex; align-items: flex-end;",
                    pickerInput(
