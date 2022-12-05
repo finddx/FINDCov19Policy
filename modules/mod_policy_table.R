@@ -51,7 +51,8 @@ mod_policy_table_server <- function(input, output, session, data, main_cols, col
     
     # Filter out na rows if needed
     if (input$cb_show_data) {
-      na_rows <- df[, rowSums(sapply(.SD, is.na)), .SDcols = main_cols[main_cols %in% colnames(df)]]
+      sdcols <- main_cols[main_cols %in% colnames(df)]
+      na_rows <- df[, rowSums(sapply(.SD, function(x) is.na(x) | x %in% c("No data", "Not applicable"))), .SDcols = sdcols]
       df <- df[na_rows == 0]
     }
     

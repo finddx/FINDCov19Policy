@@ -58,7 +58,11 @@ therapeutics_cols <- c("Covered in MPP voluntary licence territory for Nirmatrel
                        "Covered in MPP voluntary licence territory for Molnupiravir generics?",
                        "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?",
                        "Included in ACT-A partner access agreement for Molnupiravir?")
-tx_policy[, (therapeutics_cols) := lapply(.SD, function(x) ifelse(x %in% "N/A", "No data", x)), .SDcols = therapeutics_cols]
+tx_policy[, (therapeutics_cols) := lapply(.SD, function(x) ifelse(x %in% "N/A", "Not applicable", x)), .SDcols = therapeutics_cols]
+
+# Change public sector
+tx_policy[, (therapeutics_cols) := lapply(.SD, function(x) ifelse(x %in% "Yes (public sector)", "Yes (public sector only)", x)), 
+          .SDcols = therapeutics_cols]
 
 # Split xlsx ------------------------------------
 content_path <- "content"
