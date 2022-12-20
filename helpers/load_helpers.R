@@ -1,7 +1,7 @@
 read_world_bank_classification <- function() {
-  wb_classification <- readxl::read_xls("data/WorldBank Classification.xls", skip = 4)
+  wb_classification <- readxl::read_xlsx("data/WorldBank Classification.xlsx")
   setDT(wb_classification)
-  wb_classification <- wb_classification[!is.na(`Income group`) & `Income group` != "x", .(Code, `Income group`)]
+  wb_classification <- wb_classification[!is.na(`Region`), .(Code, `Income group`)]
   wb_classification[, Income := `Income group`]
   wb_classification[, `Income group` := NULL]
   wb_classification
