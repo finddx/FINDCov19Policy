@@ -159,8 +159,7 @@ tx_column_choices <- list(
     "Country",
     "Continent",
     "Income",
-    "Date of last update",
-    "Policy links"
+    "Date of last update"
   ),
   `Nirmatrelvir/Ritonavir` = c(
     "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
