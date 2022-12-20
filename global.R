@@ -42,10 +42,10 @@ dx_policy <- read_dx_policy(policy_file_path)
 
 # Split dataset ---------------------------------
 tx_only_cols <- c(
-  "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-  "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-  "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?",
-  "Included in ACT-A partner access agreement for Molnupiravir?",
+  "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
+  "Included in generic voluntary license territory for Molnupiravir generics?",
+  "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?",
+  "Included in originator access agreement with ACT-A for Molnupiravir?",
   "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20"
 )
 common_cols <- c("Flag", "Country", "Continent", "Income", "ISO", "Region", "Date of last update", "iso2c")
@@ -57,10 +57,10 @@ tx_policy <- merge(x = tx_policy, y = dx_policy[, ..merge_cols], by = "ISO")
 setcolorder(tx_policy, tx_cols)
 
 # N/A to "No data"
-therapeutics_cols <- c("Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-                       "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-                       "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?",
-                       "Included in ACT-A partner access agreement for Molnupiravir?")
+therapeutics_cols <- c("Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
+                       "Included in generic voluntary license territory for Molnupiravir generics?",
+                       "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?",
+                       "Included in originator access agreement with ACT-A for Molnupiravir?")
 tx_policy[, (therapeutics_cols) := lapply(.SD, function(x) ifelse(x %in% "N/A", "Not applicable", x)), .SDcols = therapeutics_cols]
 
 # Change public sector
@@ -113,10 +113,10 @@ dx_default_cols <- c("Country",
 tx_default_cols <- c("Country",
                      "Continent",
                      "Income",
-                     "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-                     "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-                     "Included in ACT-A partner access agreement for Molnupiravir?",
-                     "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?")
+                     "Included in generic voluntary license territory for Molnupiravir generics?",
+                     "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
+                     "Included in originator access agreement with ACT-A for Molnupiravir?",
+                     "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?")
 
 dx_column_choices <- list(
   General = c(
@@ -163,12 +163,12 @@ tx_column_choices <- list(
     "Policy links"
   ),
   `Nirmatrelvir/Ritonavir` = c(
-    "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-    "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"
+    "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
+    "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?"
   ),
   `Molnupiravir` = c(
-    "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-    "Included in ACT-A partner access agreement for Molnupiravir?"
+    "Included in generic voluntary license territory for Molnupiravir generics?",
+    "Included in originator access agreement with ACT-A for Molnupiravir?"
   )
 )
 
@@ -192,10 +192,10 @@ dx_testing_cols <- c("COVID-19 testing strategy available",
                      "Self tests used in the screening of asymptomatic populations")
 
 tx_treatment_cols <- c(
-  "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-  "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-  "Included in ACT-A partner access agreement for Molnupiravir?",
-  "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"         
+  "Included in generic voluntary license territory for Molnupiravir generics?",
+  "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
+  "Included in originator access agreement with ACT-A for Molnupiravir?",
+  "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?"         
 )
 
 dx_questions_lkp <- list(
@@ -206,8 +206,8 @@ dx_questions_lkp <- list(
 )
 
 tx_questions_lkp <- list(
-  `Molnupiravir` = "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-  `Nirmatrelvir/Ritonavir` = "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?"
+  `Molnupiravir` = "Included in generic voluntary license territory for Molnupiravir generics?",
+  `Nirmatrelvir/Ritonavir` = "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?"
 )
 
 dx_policy[, (dx_testing_cols) := lapply(.SD, function(x) {

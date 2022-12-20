@@ -15,10 +15,10 @@ read_tx_policy <- function(file_path) {
     "ISO",
     "World Bank Classification",
     "Region",
-    "Covered in MPP voluntary licence territory for Molnupiravir generics?",
-    "Covered in MPP voluntary licence territory for Nirmatrelvir/Ritonavir generics?",
-    "Included in ACT-A partner access agreement for Molnupiravir?",
-    "Included in ACT-A partner access agreement for Nirmatrelvir/Ritonavir?"
+    "Included in generic voluntary license territory for Molnupiravir generics?",
+    "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
+    "Included in originator access agreement with ACT-A for Molnupiravir?",
+    "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?"
   )
   
   tx_policy$`World Bank Classification` <- NULL
