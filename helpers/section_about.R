@@ -27,10 +27,14 @@ tx_section_about <- function() {
     column(width = 12,
            h3(id = "about", class = "mt-0 pt-0", ""),
            p(
-             paste0("Test-and-treat strategies that link diagnostics with therapeutics are essential to prevent hospitalization ",
-                    "and death from COVID-19 for those at highest risk. Oral antivirals nirmatrelvir/ritonavir ",
-                    "(strong WHO recommendation) and molnupiravir (conditional WHO recommendation) may be available to countries ",
-                    "via originators and/or generic manufacturers through various mechanisms. This dashboard represents:")
+             "Test-and-treat strategies that link diagnostics with therapeutics are essential to prevent hospitalization ",
+             "and death from COVID-19 for those at highest risk. Oral antivirals nirmatrelvir/ritonavir and molnupiravir ",
+             "(strong and conditional ", 
+             tags$a("WHO recommendations", href = "https://www.who.int/publications/i/item/WHO-2019-nCoV-therapeutics-2022.4",
+                    .noWS = "after"),
+             ", respectively, for use in patients with non-severe COVID-19 at highest risk of hospitalization) ",
+             "may be available to countries via originators and/or generic manufacturers through various mechanisms. ",
+             "This dashboard represents:"
            ),
            tags$ol(
              tags$li(paste0("The countries that have access to generic versions via the voluntary license territories of the ",
@@ -38,18 +42,24 @@ tx_section_about <- function() {
              tags$li("The countries that have access to originator products via ACT-A partner (Global Fund and/or Unicef) procurement platforms")
            ),
            p(
-             paste0("Please note that countries that are not included in the voluntary license territory may still be able to ",
-                    "access generics through other pathways, depending on the Intellectual Property status of the medicine in ",
-                    "the country. For further information, please refer to the ",
-                    "Unitaid/WHO Country Briefing on Access Treatments for COVID-19.")
+             "Prices for originator products are available to countries in ACT-A partner procurement platforms (e.g. Wambo). ",
+             "For countries included in the voluntary license territory, generics will also be available through ACT-A partners imminently."
+           ),
+           p(
+             "Please note that countries that are not included in the voluntary license territory may still be able to ",
+             "access generics. For further information, please refer to the Unitaid/WHO Country Briefing on Access Treatments for COVID-19."
            ),
            p("Please refer to the ", 
              tags$a("WHO Therapeutics and COVID-19: living guideline", href = "https://www.who.int/publications/i/item/WHO-2019-nCoV-therapeutics-2022.4"),
-             " for the latest clinical recommendation and the MPP website for the latest information on the ",
-             tags$a("nirmatrelvir", href = "https://medicinespatentpool.org/licence-post/pf-07321332"),
-             " and ", 
+             " for the latest recommendations and the ", 
+             tags$a("MPP website", href = "https://medicinespatentpool.org/"), 
+             " for the latest information on the ",
+             tags$a("nirmatrelvir", href = "https://medicinespatentpool.org/licence-post/pf-07321332", .noWS = "after"),
+             "/ritonavir and ", 
              tags$a("molnupiravir", href = "https://medicinespatentpool.org/licence-post/molnupiravir-mol"),
-             " license agreements."
+             " license agreements and ",
+             tags$a("patent information", href = "https://www.medspal.org/?page=1", .noWS = "after"),
+             "."
            )
     )
   )
