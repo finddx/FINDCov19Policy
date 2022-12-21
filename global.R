@@ -40,16 +40,18 @@ wb_classification <- read_world_bank_classification()
 policy_file_path <- "data/Policy_Mapping.xlsx"
 dx_policy <- read_dx_policy(policy_file_path)
 
+dx_policy$`Policy Links 999` <- "https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups"
+
 # Split dataset ---------------------------------
 tx_only_cols <- c(
   "Included in generic voluntary license territory for Nirmatrelvir/Ritonavir generics?",
   "Included in generic voluntary license territory for Molnupiravir generics?",
   "Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?",
   "Included in originator access agreement with ACT-A for Molnupiravir?",
-  "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20"
+  "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20", "Policy Links 21"
 )
 common_cols <- c("Flag", "Country", "Continent", "Income", "ISO", "Region", "Date of last update", "iso2c")
-merge_cols <- c(common_cols, "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20")
+merge_cols <- c(common_cols, "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20", "Policy Links 21")
 tx_cols <- c(common_cols, tx_only_cols)
 
 tx_policy <- read_tx_policy("data/Therapeutics.xlsx")
