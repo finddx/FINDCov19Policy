@@ -40,7 +40,7 @@ wb_classification <- read_world_bank_classification()
 policy_file_path <- "data/Policy_Mapping.xlsx"
 dx_policy <- read_dx_policy(policy_file_path)
 
-dx_policy$`Policy Links 999` <- "https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups"
+dx_policy$`Policy Links 21` <- "https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups"
 
 # Split dataset ---------------------------------
 tx_only_cols <- c(
