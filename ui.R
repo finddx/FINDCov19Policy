@@ -2,20 +2,11 @@ banner <- tags$section(class = "hero",
   tags$span(class = "gradient",
     tags$div(class = "content",
       tags$div(style = "display: flex; align-items: center;",
-        tags$h2(class = "subtitle underline", "COVID-19 Diagnostics Policy and Therapeutics Access Dashboard"),
-        tags$img(src = "unitaid_logo.png", height = "110px")
+        tags$h2(class = "subtitle underline", "COVID-19 Diagnostics Policy and Therapeutics Access Dashboard")
       )
     )
   )
 )
-
-HTML('
-  <section class="hero"><span class="gradient"></span>
-      <div class="content">
-          <h2 class="subtitle underline">COVID-19 Diagnostics Policy and Therapeutics Access Dashboard</h2>
-      </div>
-  </section>
-')
 
 tabset_panel <- shiny::tabsetPanel(id = "id",
   shiny::tabPanel(title = "Diagnostics", value = "testing_rates",
