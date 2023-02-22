@@ -37,7 +37,7 @@ lapply(module_files, source)
 wb_classification <- read_world_bank_classification()
 
 # Read dx policy --------------------------------
-policy_file_path <- "data/Policy_Mapping.xlsx"
+policy_file_path <- file.path("data", "Policy_Mapping.xlsx")
 dx_policy <- read_dx_policy(policy_file_path)
 
 dx_policy$`Policy Links 21` <- "https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups"
@@ -54,7 +54,7 @@ common_cols <- c("Flag", "Country", "Continent", "Income", "ISO", "Region", "Dat
 merge_cols <- c(common_cols, "Policy Links 17", "Policy Links 18",	"Policy Links 19", "Policy Links 20", "Policy Links 21")
 tx_cols <- c(common_cols, tx_only_cols)
 
-tx_policy <- read_tx_policy("data/Therapeutics.xlsx")
+tx_policy <- read_tx_policy(file.path("data", "Therapeutics.xlsx"))
 tx_policy <- merge(x = tx_policy, y = dx_policy[, ..merge_cols], by = "ISO")
 setcolorder(tx_policy, tx_cols)
 
