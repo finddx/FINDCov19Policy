@@ -1,5 +1,6 @@
 read_world_bank_classification <- function() {
-  wb_classification <- readxl::read_xlsx("data/WorldBank Classification.xlsx")
+  file_path <- file.path("data", "WorldBank Classification.xlsx")
+  wb_classification <- readxl::read_xlsx(file_path)
   setDT(wb_classification)
   wb_classification <- wb_classification[!is.na(`Region`), .(Code, `Income group`)]
   wb_classification[, Income := `Income group`]
@@ -25,6 +26,12 @@ read_tx_policy <- function(file_path) {
   tx_policy$`Region` <- NULL
   tx_policy$`Country` <- NULL
   
+  # Group Access price and Tiered price together)
+  tx_policy[["Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?"]] <- ifelse(
+    stringr::str_detect(tx_policy[["Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?"]], "Yes"),
+    "Yes",
+    tx_policy[["Included in originator access agreement with ACT-A for Nirmatrelvir/Ritonavir?"]]
+  )
   tx_policy
 }
 
