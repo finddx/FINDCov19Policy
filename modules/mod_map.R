@@ -144,7 +144,7 @@ mod_map_server <- function(input, output, session, column_choices, questions_lkp
         }
       ", selector_id)))
   }) %>% 
-    bindCache(input$slt_question, input$i_roam, unname(tools::md5sum("data/Policy_Mapping.xlsx")))
+    bindCache(input$slt_question, input$i_roam, unname(tools::md5sum(file.path("data", "Policy_Mapping.xlsx"))))
   
   # Event: User clicked on map ----------------------------
   observeEvent(input$map_clicked_data, {
