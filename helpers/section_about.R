@@ -26,6 +26,9 @@ tx_section_about <- function() {
   fluidRow(
     column(width = 12,
            h3(id = "about", class = "mt-0 pt-0", ""),
+           
+           tags$img(src = "unitaid_logo.png", height = "70px"),
+           
            p(
              "Test-and-treat strategies that link diagnostics with therapeutics are essential to prevent hospitalization ",
              "and death from COVID-19 for those at highest risk. Oral antivirals nirmatrelvir/ritonavir and molnupiravir ",
