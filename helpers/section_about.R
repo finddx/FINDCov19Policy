@@ -50,7 +50,8 @@ tx_section_about <- function() {
            ),
            p(
              "Please note that countries that are not included in the voluntary license territory may still be able to ",
-             "access generics. For further information, please refer to the Unitaid/WHO Country Briefing on Access Treatments for COVID-19."
+             "access generics through various options available to countries facing Intellectual Property barriers, ",
+             "including TRIPS flexibilities, compulsory licensing, and exceptions for least-developed countries."
            ),
            p("Please refer to the ", 
              tags$a("WHO Therapeutics and COVID-19: living guideline", href = "https://www.who.int/publications/i/item/WHO-2019-nCoV-therapeutics-2022.4"),
