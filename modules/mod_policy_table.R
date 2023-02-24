@@ -1,4 +1,4 @@
-mod_policy_table_ui <- function(id, title, column_choices, default_cols) {
+mod_policy_table_ui <- function(id, title, column_choices, default_cols, last_update_date) {
   ns <- NS(id)
   tagList(
     fluidRow(
@@ -32,8 +32,9 @@ mod_policy_table_ui <- function(id, title, column_choices, default_cols) {
              h3("Download the data"),
              p("The selected data can be downloaded from", downloadLink(ns("lnk_download_selected"), label = "here,"), 
                "and the raw dataset can be downloaded from", downloadLink(ns("lnk_download_raw"), label = "here.")),
-             p(class = "small", paste0("The data were last updated on: ",
-                                       format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e%b%Y")
+             p(class = "small", paste0("The data was last updated on: ",
+                                       format(as.Date(last_update_date), "%e %b %Y")
+                                       # format(as.Date(max(dx_policy$`Date of last update`, na.rm = TRUE)), "%e%b%Y")
              ))
       )
     )

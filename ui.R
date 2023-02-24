@@ -21,7 +21,7 @@ tabset_panel <- shiny::tabsetPanel(id = "id",
                        categories = c("Molecular Test", "Antibody RDT", "Professional Use Antigen RDT", "Self-test Antigen RDT"),
                        category_help_text = "Please select to display whether Molecular/Antigen/Antibody testing is registered for use in countries"),
             mod_policy_table_ui(id = "mod_table_diagnostic", title = "Diagnostics Policy Table",
-                                column_choices = dx_column_choices, default_cols = dx_default_cols),
+                                column_choices = dx_column_choices, default_cols = dx_default_cols, last_update_date = "2022-08-31"),
             dx_section_contact()
           )
         )
@@ -39,7 +39,7 @@ tabset_panel <- shiny::tabsetPanel(id = "id",
                        categories = c("Nirmatrelvir/Ritonavir", "Molnupiravir"),
                        category_help_text = "Please select to display if countries are eligible to access nirmatrelvir/ritonavir or molnupiravir from ACT-A partners and/or are included in MPP’s Voluntary License territory"),
             mod_policy_table_ui(id = "mod_table_treatment", title = "Treatment Access Table",
-                                column_choices = tx_column_choices, default_cols = tx_default_cols),
+                                column_choices = tx_column_choices, default_cols = tx_default_cols, last_update_date = "2023-02-22"),
             tx_section_contact()
           )
         )
